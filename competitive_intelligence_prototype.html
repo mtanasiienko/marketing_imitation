@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IntelliTrack — Competitive Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f0f0f0;background-attachment:fixed;min-height:100vh;color:#1a1a1a;overflow:hidden}
+:root{--white:#fff;--dark:#111827;--purple:#E84520;--pink:#ec4899;--blue:#3b82f6;--green:#10b981;--orange:#f97316;--red:#ef4444;--gray:#6b7280;--shadow:0 2px 16px rgba(0,0,0,.06);--shadow-lg:0 6px 32px rgba(0,0,0,.11);--r:18px;--r-sm:12px}
+.app{display:flex;height:100vh;overflow:hidden}
+/* SIDEBAR */
+.sidebar{width:72px;background:var(--white);border-radius:0 24px 24px 0;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:6px;z-index:100;flex-shrink:0}
+.s-logo{width:40px;height:40px;background:var(--purple);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-family:'Inter',sans-serif;font-weight:800;font-size:12px;color:#fff;letter-spacing:-.5px;cursor:pointer}
+.s-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;color:var(--gray);position:relative;border:none;background:transparent}
+.s-icon:hover{background:#FEF0EC;color:var(--purple)}
+.s-icon.active{background:var(--purple);color:#fff}
+.s-badge{position:absolute;top:9px;right:9px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid #fff}
+.s-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:8px}
+.s-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#E84520,#f97316);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:13px;cursor:pointer}
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:22px 26px;position:relative}
+.main::-webkit-scrollbar{width:5px}
+.main::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:3px}
+/* TOP NAV */
+.top-nav{display:flex;align-items:center;justify-content:center;margin-bottom:28px;position:relative}
+.nav-pill{background:var(--dark);border-radius:50px;padding:5px;display:flex;gap:2px;flex-shrink:0}
+.np-item{padding:7px 18px;border-radius:40px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;color:rgba(255,255,255,.6);white-space:nowrap;border:none;background:transparent;font-family:'Inter',sans-serif}
+.np-item:hover{color:rgba(255,255,255,.9)}
+.np-item.active{background:#fff;color:var(--dark);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:10px;position:absolute;right:0}
+.icon-btn{width:38px;height:38px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow);border:none;color:var(--gray);transition:transform .2s;flex-shrink:0}
+.icon-btn:hover{transform:scale(1.06)}
+.u-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#E84520,#f97316);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(232,69,32,.3);flex-shrink:0}
+/* PAGE */
+.page-title{font-family:'Inter',sans-serif;font-size:32px;font-weight:700;color:var(--dark);margin-bottom:20px;letter-spacing:-.3px}
+.page-enter{animation:pgIn .3s ease}
+@keyframes pgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* CARD */
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:22px}
+.card-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+.card-title{font-family:'Inter',sans-serif;font-size:18px;font-weight:600;color:var(--dark)}
+.card-sub{font-size:13px;font-weight:400;color:var(--gray);margin-bottom:14px}
+.exp-btn{width:30px;height:30px;background:#f5f5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:var(--gray);flex-shrink:0}
+.exp-btn:hover{background:#eee}
+/* DASHBOARD GRID */
+.dash-grid{display:grid;grid-template-columns:360px 1fr;gap:18px}
+.col-left{grid-row:1/3;display:flex;flex-direction:column;gap:18px}
+/* SEARCH */
+.search-bar{display:flex;align-items:center;gap:8px;background:#f8f8f8;border-radius:12px;padding:9px 13px;margin-bottom:14px}
+.search-bar input{flex:1;border:none;background:transparent;font-family:'Inter',sans-serif;font-size:13px;color:var(--dark);outline:none}
+.search-bar input::placeholder{color:var(--gray)}
+.search-btn{width:32px;height:32px;background:var(--dark);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;flex-shrink:0}
+/* COMPETITOR ITEM */
+.comp-item{border-radius:16px;padding:15px;cursor:pointer;transition:all .2s;animation:itemIn .3s ease both}
+@keyframes itemIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.comp-item:hover{transform:translateX(3px);filter:brightness(.97)}
+.comp-item-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
+.comp-name{font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:var(--dark)}
+.comp-desc{font-size:13px;font-weight:400;color:#555;line-height:1.4;margin-bottom:10px}
+.comp-footer{display:flex;align-items:center;justify-content:space-between}
+.comp-date{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray)}
+.av-group{display:flex}
+.av-mini{width:24px;height:24px;border-radius:50%;border:2px solid #fff;background:var(--dark);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:-7px}
+.av-mini:first-child{margin-left:0}
+.threat-badge{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600}
+.t-high{background:#fce7e7;color:#c62828}
+.t-med{background:#fff3cd;color:#e65100}
+.t-low{background:#e8f5e9;color:#2e7d32}
+/* CHART */
+.chart-legend{display:flex;gap:14px;margin-bottom:12px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--gray)}
+.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.chart-toggle{display:flex;align-items:center;background:#f5f5f5;border-radius:8px;padding:3px}
+.ct-btn{padding:4px 11px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .15s;color:var(--gray);border:none;background:transparent;font-family:'Inter',sans-serif}
+.ct-btn.active{background:#fff;color:var(--dark);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+/* BOTTOM ROW */
+.bot-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+/* CHANGE ITEM */
+.ch-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0f0f0}
+.ch-item:last-child{border-bottom:none}
+.ch-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ch-info{flex:1}
+.ch-name{font-size:14px;font-weight:500;color:var(--dark)}
+.ch-time{font-size:12px;font-weight:400;color:var(--gray)}
+.ch-pct{font-size:13px;font-weight:700;color:var(--dark)}
+.conf-bar{width:52px;height:4px;background:#f0f0f0;border-radius:2px;overflow:hidden;margin-top:3px}
+.conf-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#E84520,#f97316)}
+/* SCORE ITEM */
+.sc-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:all .15s}
+.sc-item:hover{background:#f8f8f8;margin:0 -8px;padding:9px 8px;border-radius:10px}
+.sc-item:last-child{border-bottom:none}
+.sc-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.sc-info{flex:1}
+.sc-name{font-size:14px;font-weight:600;color:var(--dark)}
+.sc-meta{font-size:12px;font-weight:400;color:var(--gray)}
+.sc-score{font-family:'Inter',sans-serif;font-size:16px;font-weight:700;color:var(--dark)}
+/* STAT CARDS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:var(--r-sm);padding:14px 16px;box-shadow:var(--shadow)}
+.stat-num{font-family:'Inter',sans-serif;font-size:26px;font-weight:700;color:var(--dark)}
+.stat-lbl{font-size:13px;font-weight:400;color:var(--gray);margin-top:2px}
+.stat-chg{font-size:12px;font-weight:600;margin-top:5px}
+.up{color:var(--green)}.down{color:var(--red)}
+/* FILTER PILLS */
+.filter-pills{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
+.fpill{padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'Inter',sans-serif}
+.fpill.active{background:var(--dark);color:#fff}
+.fpill:not(.active){background:#fff;color:var(--gray);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.fpill:not(.active):hover{background:#FEF0EC;color:var(--purple)}
+/* COMPETITOR CARDS PAGE */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+.comp-card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:all .25s}
+.comp-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.cc-hdr{padding:18px 18px 14px;display:flex;align-items:center;justify-content:space-between}
+.cc-logo{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:#fff}
+.cc-info{padding:0 18px 18px}
+.cc-name{font-family:'Inter',sans-serif;font-size:16px;font-weight:600;color:var(--dark);margin-bottom:3px}
+.cc-domain{font-size:13px;font-weight:400;color:var(--gray);margin-bottom:12px}
+.mb-item{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.mb-lbl{width:48px;font-size:12px;font-weight:400;color:var(--gray)}
+.mb-track{flex:1;height:5px;background:#f0f0f0;border-radius:3px;overflow:hidden}
+.mb-fill{height:100%;border-radius:3px}
+.mb-val{width:28px;font-size:12px;font-weight:600;color:var(--dark);text-align:right}
+/* ALERTS */
+.alerts-list{display:flex;flex-direction:column;gap:11px}
+.al-card{background:#fff;border-radius:var(--r-sm);box-shadow:var(--shadow);padding:14px 18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:all .2s;border-left:4px solid transparent}
+.al-card:hover{transform:translateX(4px)}
+.al-critical{border-left-color:var(--red)}
+.al-high{border-left-color:var(--orange)}
+.al-medium{border-left-color:#eab308}
+.al-low{border-left-color:var(--green)}
+.al-sev{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.sev-critical{background:#fee2e2}.sev-high{background:#ffedd5}.sev-medium{background:#fef9c3}.sev-low{background:#dcfce7}
+.al-content{flex:1}
+.al-title{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:3px}
+.al-desc{font-size:14px;font-weight:400;color:var(--gray);line-height:1.5}
+.al-meta{font-size:12px;font-weight:400;color:var(--gray);margin-top:5px;display:flex;align-items:center;gap:8px}
+/* REPORTS */
+.rep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.rep-card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:22px;cursor:pointer;transition:all .25s;display:flex;flex-direction:column;gap:10px}
+.rep-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.rep-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.rep-title{font-family:'Inter',sans-serif;font-size:16px;font-weight:600;color:var(--dark)}
+.rep-meta{font-size:13px;font-weight:400;color:var(--gray)}
+.rep-status{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;width:fit-content}
+.status-ready{background:#dcfce7;color:#166534}
+.status-gen{background:#fef9c3;color:#854d0e;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.rep-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:10px;border-top:1px solid #f5f5f5}
+.rep-dl{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--purple);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif}
+.rep-dl:hover{text-decoration:underline}
+/* SETTINGS */
+.set-section{margin-bottom:28px}
+.set-title{font-family:'Inter',sans-serif;font-size:16px;font-weight:600;margin-bottom:14px;color:var(--dark)}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid #f0f0f0}
+.set-row:last-child{border-bottom:none}
+.set-row-label{font-size:14px;font-weight:500;color:var(--dark)}
+.set-row-desc{font-size:13px;font-weight:400;color:var(--gray);margin-top:2px}
+.toggle{width:42px;height:23px;border-radius:12px;background:#e5e7eb;position:relative;cursor:pointer;transition:background .2s;border:none;flex-shrink:0}
+.toggle.on{background:var(--purple)}
+.toggle::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle.on::after{transform:translateX(19px)}
+.intg-card{background:#fff;border-radius:var(--r-sm);box-shadow:var(--shadow);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.intg-logo{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.intg-info{flex:1}
+.intg-name{font-size:14px;font-weight:600;color:var(--dark)}
+.intg-status{font-size:13px;font-weight:400;color:var(--gray)}
+.btn-connect{padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .15s}
+.btn-connected{background:#dcfce7;color:#166534}
+.btn-disconnected{background:var(--dark);color:#fff}
+.btn-disconnected:hover{background:#374151}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(5px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{background:#fff;border-radius:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:28px;animation:slideUp .3s ease}
+.modal-box::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.modal-title{font-family:'Inter',sans-serif;font-size:20px;font-weight:600;color:var(--dark)}
+.close-btn{width:32px;height:32px;border-radius:50%;background:#f5f5f5;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray)}
+.close-btn:hover{background:#eee}
+.input-field{width:100%;padding:11px 14px;border:2px solid #f0f0f0;border-radius:11px;font-family:'Inter',sans-serif;font-size:13.5px;color:var(--dark);outline:none;transition:border-color .2s;margin-bottom:12px}
+.input-field:focus{border-color:var(--purple)}
+.input-label{font-size:13px;font-weight:600;color:var(--dark);margin-bottom:5px;display:block}
+.btn-row{display:flex;gap:10px;margin-top:20px}
+.btn-primary{flex:1;background:var(--dark);color:#fff;border:none;border-radius:11px;padding:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:#374151}
+.btn-secondary{flex:1;background:#f5f5f5;color:var(--dark);border:none;border-radius:11px;padding:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer}
+/* INTEL PAGE */
+.intel-tabs{display:flex;gap:3px;background:#f5f5f5;border-radius:12px;padding:4px;margin-bottom:18px;width:fit-content}
+.i-tab{padding:7px 16px;border-radius:9px;font-size:12.5px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--gray);font-family:'Inter',sans-serif;transition:all .15s}
+.i-tab.active{background:#fff;color:var(--dark);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:18px}
+.kpi-card{background:#fff;border-radius:var(--r-sm);padding:14px;box-shadow:var(--shadow)}
+.kpi-lbl{font-size:13px;font-weight:400;color:var(--gray);margin-bottom:3px}
+.kpi-val{font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--dark)}
+.kpi-chg{font-size:12px;margin-top:3px;font-weight:500}
+.data-table{width:100%;border-collapse:collapse;background:#fff;border-radius:var(--r-sm);overflow:hidden;box-shadow:var(--shadow)}
+.data-table th{background:#f8f8f8;padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--gray);border-bottom:1px solid #f0f0f0}
+.data-table td{padding:11px 14px;font-size:14px;font-weight:400;border-bottom:1px solid #f8f8f8;color:var(--dark)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#fafafa}
+.trend-up{color:var(--green);font-weight:600}
+.trend-down{color:var(--red);font-weight:600}
+/* MOBILE NAV */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;box-shadow:0 -4px 20px rgba(0,0,0,.1);padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:1000}
+.mob-nav-items{display:flex;justify-content:space-around}
+.mob-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 14px;cursor:pointer;color:var(--gray);border:none;background:transparent;font-family:'Inter',sans-serif;font-size:10px;transition:color .2s}
+.mob-nav-item.active{color:var(--purple)}
+/* ADD BTN */
+.add-btn{width:100%;padding:10px;border:2px dashed #d1d5db;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:12.5px;color:var(--gray);cursor:pointer;transition:all .2s;background:transparent;font-family:'Inter',sans-serif;margin-top:7px}
+.add-btn:hover{border-color:var(--purple);color:var(--purple);background:#FEF0EC}
+/* ── COMPETITOR PROFILE PAGE ── */
+.cp-hero{border-radius:var(--r);overflow:hidden;margin-bottom:20px;position:relative}
+.cp-hero-banner{height:120px;position:relative;display:flex;align-items:flex-end;padding:0 28px 20px}
+.cp-hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,.18))}
+.cp-hero-body{padding:0 28px 24px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.cp-logo-wrap{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-size:24px;font-weight:800;color:#fff;box-shadow:var(--shadow);flex-shrink:0;margin-top:-32px;border:3px solid #fff}
+.cp-hero-info{flex:1}
+.cp-hero-name{font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:var(--dark);margin-bottom:3px}
+.cp-hero-domain{font-size:14px;font-weight:400;color:var(--gray)}
+.cp-hero-actions{display:flex;gap:10px;align-items:center}
+.cp-metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+.cp-metric-card{background:#fff;border-radius:var(--r-sm);padding:16px;box-shadow:var(--shadow);text-align:center}
+.cp-metric-icon{font-size:20px;margin-bottom:6px}
+.cp-metric-val{font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--dark)}
+.cp-metric-lbl{font-size:13px;font-weight:400;color:var(--gray);margin-top:3px}
+.cp-body{display:grid;grid-template-columns:1fr 380px;gap:20px}
+/* Activity section */
+.act-filter{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.act-fpill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .15s}
+.act-category-group{margin-bottom:18px}
+.act-category-label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray);margin-bottom:10px}
+.act-category-line{flex:1;height:1px;background:#f0f0f0}
+.act-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #f8f8f8}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.act-text{font-size:14px;font-weight:400;color:var(--dark);line-height:1.5}
+.act-time{font-size:12px;font-weight:400;color:var(--gray);margin-top:2px}
+/* Partnerships block */
+.partner-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:#f6f6f6;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.partner-item:hover{background:#FEF0EC}
+.partner-logo{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.partner-info{flex:1}
+.partner-name{font-size:14px;font-weight:600;color:var(--dark)}
+.partner-type{font-size:13px;font-weight:400;color:var(--gray)}
+.partner-since{font-size:11px;color:var(--gray);background:#f0f0f0;padding:2px 7px;border-radius:20px}
+.channel-section{margin-bottom:14px}
+.channel-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--gray);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.channel-tags{display:flex;flex-wrap:wrap;gap:6px}
+.channel-tag{padding:4px 10px;border-radius:20px;font-size:13px;font-weight:400}
+.b2b-bar{margin-top:6px}
+.b2b-track{height:10px;background:#f0f0f0;border-radius:5px;overflow:hidden;position:relative}
+.b2b-fill{height:100%;background:linear-gradient(90deg,#E84520,#f97316);border-radius:5px}
+.b2b-labels{display:flex;justify-content:space-between;font-size:13px;font-weight:500;color:var(--gray);margin-top:5px}
+/* Section title */
+.section-title{font-family:'Inter',sans-serif;font-size:16px;font-weight:600;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:#f0f0f0}
+/* BACK BTN */
+.back-btn{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--gray);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;margin-bottom:18px;padding:7px 12px;border-radius:10px;transition:all .2s}
+.back-btn:hover{background:#fff;color:var(--dark);box-shadow:var(--shadow)}
+/* ── ANALYSIS SECTIONS ── */
+.cp-section{margin-top:24px}
+.cp-section-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.cp-section-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cp-section-title{font-family:'Inter',sans-serif;font-size:18px;font-weight:600;color:var(--dark)}
+.cp-section-line{flex:1;height:1px;background:#ebebeb}
+.analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.analysis-grid-wide{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.a-card{background:#fff;border-radius:var(--r-sm);box-shadow:var(--shadow);padding:18px}
+.a-card-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--gray);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+/* Channel bars */
+.ch-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ch-bar-row:last-child{margin-bottom:0}
+.ch-bar-lbl{width:46px;font-size:12px;font-weight:500;color:var(--dark)}
+.ch-bar-track{flex:1;height:7px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+.ch-bar-fill{height:100%;border-radius:4px}
+.ch-bar-val{width:28px;font-size:12px;font-weight:600;color:var(--dark);text-align:right}
+/* Traffic source bars */
+.src-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.src-row:last-child{margin-bottom:0}
+.src-lbl{width:58px;font-size:12px;font-weight:400;color:var(--gray)}
+.src-track{flex:1;height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden}
+.src-fill{height:100%;border-radius:3px}
+.src-val{width:28px;font-size:12px;font-weight:600;text-align:right}
+/* Social platform rows */
+.soc-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.soc-row:last-child{border-bottom:none}
+.soc-name{font-size:13px;font-weight:600;color:var(--dark);width:80px}
+.soc-followers{font-size:12px;font-weight:500;color:var(--dark);min-width:42px}
+.soc-growth{font-size:12px;font-weight:600}
+.soc-eng{font-size:12px;color:var(--gray)}
+/* Keyword tags */
+.kw-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.kw-tag{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:400;background:#FEF0EC;color:#E84520}
+/* Metric pair */
+.metric-pair{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f8f8f8}
+.metric-pair:last-child{border-bottom:none}
+.mp-lbl{font-size:13px;font-weight:400;color:var(--gray)}
+.mp-val{font-size:13px;font-weight:600;color:var(--dark)}
+/* SoV gauge */
+.sov-bar{height:10px;background:#f0f0f0;border-radius:5px;overflow:hidden;margin:10px 0 5px}
+.sov-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#E84520,#f97316)}
+/* Mention tags */
+.mention-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mention-tag{padding:3px 9px;border-radius:20px;font-size:12px;background:#f8f8f8;color:var(--gray);border:1px solid #ebebeb}
+/* Influencer item */
+.inf-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.inf-item:last-child{border-bottom:none}
+.inf-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.inf-info{flex:1}
+.inf-name{font-size:13px;font-weight:600;color:var(--dark)}
+.inf-role{font-size:12px;color:var(--gray)}
+.inf-reach{font-size:12px;font-weight:600;color:var(--purple)}
+/* Email campaign tags */
+.email-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.email-tag{padding:4px 10px;border-radius:20px;font-size:12px;background:#fef3c7;color:#92400e}
+/* ── DATE RANGE PICKER ── */
+.nav-left{position:absolute;left:0;display:flex;align-items:center;gap:8px}
+.drp-btn{display:flex;align-items:center;gap:7px;background:#fff;border:1.5px solid #e8e8e8;border-radius:10px;padding:7px 13px;font-size:13px;font-weight:500;color:var(--dark);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;white-space:nowrap;box-shadow:var(--shadow)}
+.drp-btn:hover,.drp-btn.open{border-color:var(--purple);box-shadow:0 0 0 3px rgba(232,69,32,.1)}
+.drp-btn svg{opacity:.55}
+.drp-btn-lbl{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drp-wrap{position:relative;z-index:200}
+.drp-overlay{position:fixed;inset:0;z-index:199}
+.drp-panel{position:absolute;left:0;top:calc(100% + 8px);background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.14);padding:16px;min-width:244px;z-index:300;animation:pgIn .18s ease}
+.drp-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray);margin-bottom:8px}
+.drp-presets{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.drp-preset{padding:8px 10px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid #f0f0f0;background:#f8f8f8;color:var(--gray);font-family:'Inter',sans-serif;transition:all .15s;text-align:center}
+.drp-preset:hover{border-color:var(--purple);background:#FEF0EC;color:var(--purple)}
+.drp-preset.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+.drp-divider{height:1px;background:#f0f0f0;margin:10px 0}
+.drp-custom-toggle{width:100%;padding:8px 12px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid #f0f0f0;background:#f8f8f8;color:var(--gray);font-family:'Inter',sans-serif;transition:all .15s;text-align:left;display:flex;align-items:center;justify-content:space-between}
+.drp-custom-toggle:hover,.drp-custom-toggle.active{border-color:var(--purple);color:var(--purple);background:#FEF0EC}
+.drp-custom-body{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.drp-date-row{display:flex;align-items:center;gap:8px}
+.drp-date-lbl{font-size:12px;font-weight:600;color:var(--gray);width:28px;flex-shrink:0}
+.drp-date-input{flex:1;padding:7px 10px;border:1.5px solid #e8e8e8;border-radius:9px;font-size:13px;font-family:'Inter',sans-serif;color:var(--dark);outline:none;transition:border-color .2s;background:#fafafa}
+.drp-date-input:focus{border-color:var(--purple);background:#fff}
+.drp-apply{width:100%;margin-top:4px;padding:9px;background:var(--purple);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s}
+.drp-apply:hover{opacity:.88}
+.drp-apply:disabled{opacity:.4;cursor:not-allowed}
+/* Range badge shown inside pages */
+.range-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:500;background:#FEF0EC;color:var(--purple);margin-bottom:16px}
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .dash-grid{grid-template-columns:1fr}.col-left{grid-row:auto}
+  .bot-row{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .cp-metrics{grid-template-columns:repeat(3,1fr)}
+  .cp-body{grid-template-columns:1fr}
+  .analysis-grid,.analysis-grid-wide{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  body{overflow:auto}.app{flex-direction:column;height:auto;overflow:auto}
+  .sidebar{display:none}.mob-nav{display:block}
+  .main{padding:14px 14px calc(78px + env(safe-area-inset-bottom))}
+  .page-title{font-size:26px}.nav-pill{display:none}
+  .top-nav{margin-bottom:16px;justify-content:flex-start}
+  .nav-left{position:static}
+  .nav-right{position:static}
+  .stat-row{grid-template-columns:1fr 1fr}
+  .comp-grid{grid-template-columns:1fr}
+  .rep-grid{grid-template-columns:1fr}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .cp-metrics{grid-template-columns:1fr 1fr}
+  .cp-body{grid-template-columns:1fr}
+  .analysis-grid,.analysis-grid-wide{grid-template-columns:1fr}
+  .cp-hero-body{padding:0 16px 18px}
+}
+@media(max-width:480px){
+  .stat-row{grid-template-columns:1fr}
+  .bot-row{grid-template-columns:1fr}
+  .cp-metrics{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useCallback, useRef, useEffect } = React;
+
+/* ── DATA ── */
+const COMPETITORS = [
+  {
+    id:1, name:'Wingo', domain:'wingo.com.ua', color:'#fce4ec', logoColor:'#880e4f',
+    threat:'High', score:9840, change:+156,
+    seo:78, social:82, ads:71, reviews:4.4, pricing:'від $5.95/кг',
+    lastUpdated:'1h ago', desc:'16+ років досвіду. Найширша мережа: 100+ країн, склади UA/CN/KR/PL.',
+    date:'24 Mar 2026', avs:['W','M'],
+    activity:[
+      {cat:'marketing', icon:'📢', text:'Новий рекламний кампейн у Instagram — акція "Перше замовлення -10%"', time:'3h ago', color:'#f97316'},
+      {cat:'seo', icon:'🔍', text:'Опубліковано 2 нові статті в блозі про імпорт з Китаю', time:'1d ago', color:'#10b981'},
+      {cat:'pricing', icon:'💰', text:'Знижено тариф на морські перевезення з Китаю до $195/м³', time:'2d ago', color:'#ef4444'},
+      {cat:'product', icon:'⚡', text:'Оновлено особистий кабінет — новий інтерфейс трекінгу', time:'4d ago', color:'#E84520'},
+      {cat:'partnership', icon:'🤝', text:'Підписано угоду з новим агентом у Південній Кореї', time:'1w ago', color:'#3b82f6'},
+      {cat:'marketing', icon:'📢', text:'Запущено відеокампанію на YouTube про сервіс доставки', time:'2w ago', color:'#f97316'},
+    ],
+    partnerships:{
+      strategic:[
+        {name:'Rozetka',type:'E-commerce партнер',since:'2021',logo:'RZ',bg:'#f97316'},
+        {name:'Prom.ua',type:'Маркетплейс',since:'2020',logo:'PR',bg:'#3b82f6'},
+        {name:'Nova Poshta',type:'Остання миля',since:'2019',logo:'NP',bg:'#ef4444'},
+        {name:'PrivatBank',type:'Фінансовий партнер',since:'2022',logo:'PB',bg:'#10b981'},
+      ],
+      channels:{
+        online:['wingo.com.ua','Instagram @company_wingo','Facebook @wingogroup','LinkedIn','Telegram-бот'],
+        offline:['Власний офіс у Києві','Склади UA/CN/KR/PL','Регіональні агенти'],
+        marketplace:['Rozetka','Prom.ua','OLX'],
+      },
+      b2b:75,b2c:25,
+      notes:'Переважно B2B: дистрибʼютори, ритейлери, виробники. Зростаючий B2C-сегмент через Instagram та Telegram.',
+    },
+    marketing:{
+      channels:[
+        {name:'SEO',score:78,color:'#10b981'},{name:'PPC',score:71,color:'#3b82f6'},
+        {name:'Social',score:82,color:'#ec4899'},{name:'PR',score:55,color:'#f97316'},{name:'Email',score:48,color:'#E84520'},
+      ],
+      content:{
+        types:['Блог про імпорт','Відеоогляди','Кейси клієнтів','Instagram-рілс','Telegram-пости'],
+        frequency:'4–5 постів/тиждень у соцмережах',
+        engagement:'Середній — 80–120 реакцій/пост в Instagram',
+        topPiece:'Гайд "Як замовити товар з Китаю у 2026"',
+      },
+      messaging:{
+        keyMessages:['16 років досвіду та надійності','Прозорі ціни без прихованих комісій','Доставка з 100+ країн світу'],
+        tov:'Дружній, експертний, зрозумілий. Орієнтований на довіру та досвід.',
+        story:'Позиціонується як надійний партнер для бізнесу — підкреслює стаж і масштаб мережі.',
+      },
+      media:{
+        shareOfVoice:28,
+        prActivity:'Помірна — 1-2 публікації/місяць у галузевих ЗМІ.',
+        mentions:['Delo.ua','Logist.fm','E-commerce Ukraine','Новини логістики'],
+      },
+      influencers:[
+        {name:'@importpro_ua',role:'Логістика з Китаю',platform:'Instagram',reach:'45K'},
+        {name:'OLX Бізнес-спільнота',role:'Партнер',platform:'OLX',reach:'B2B сегмент'},
+        {name:'Telegram "Імпорт UA"',role:'Контент-партнер',platform:'Telegram',reach:'28K'},
+      ],
+    },
+    digital:{
+      web:{monthlyTraffic:'42K',sources:{organic:48,paid:22,social:18,direct:12},bounceRate:'41%',avgSession:'2m 58s'},
+      seo:{organicVisibility:78,domainAuthority:38,topKeywords:['доставка з китаю','міжнародна логістика','імпорт товарів'],backlinks:'3.2K',rankingPages:680},
+      paid:{platforms:['Google Search','Facebook/Instagram'],budget:'₴85K/міс',creatives:12,targeting:'Підприємці, ФОП, інтернет-магазини (Київ та обл.)',topAd:'"Доставка з Китаю від $5.95/кг" — форма замовлення'},
+      social:[
+        {name:'Instagram',followers:'18.4K',growth:'+5.2%',engagement:'3.2%',posts:5},
+        {name:'Facebook',followers:'12.1K',growth:'+2.1%',engagement:'2.4%',posts:4},
+        {name:'LinkedIn',followers:'3.8K',growth:'+3.8%',engagement:'4.1%',posts:2},
+        {name:'Telegram',followers:'9.2K',growth:'+7.4%',engagement:'6.8%',posts:6},
+      ],
+      email:{frequency:'2× на місяць + автоматичні тригери',campaigns:['Акції та знижки','Новини тарифів','Кейси клієнтів','Оновлення сервісу'],listSize:'~14K підписників'},
+    },
+  },
+  {
+    id:2, name:'EasyXpress', domain:'easyxpress.com.ua', color:'#ede7f6', logoColor:'#4527a0',
+    threat:'High', score:9210, change:+89,
+    seo:74, social:68, ads:85, reviews:4.6, pricing:'від $6.50/кг',
+    lastUpdated:'2h ago', desc:'12 років, 3M+ посилок, 190K+ клієнтів. Лідер доставки зі США.',
+    date:'24 Mar 2026', avs:['E','X'],
+    activity:[
+      {cat:'pricing', icon:'💰', text:'Знижено тариф Economy зі США — тепер від $6.50/кг', time:'4h ago', color:'#ef4444'},
+      {cat:'marketing', icon:'📢', text:'Запущено нову кампанію в Google Shopping для B2C-сегменту', time:'1d ago', color:'#f97316'},
+      {cat:'product', icon:'⚡', text:'Доданий новий калькулятор вартості доставки на сайті', time:'3d ago', color:'#E84520'},
+      {cat:'partnership', icon:'🤝', text:'Партнерство з 3 популярними US-ритейлерами для спрощення закупівлі', time:'5d ago', color:'#3b82f6'},
+      {cat:'seo', icon:'🔍', text:'Нова посадкова сторінка "Доставка з Amazon в Україну"', time:'1w ago', color:'#10b981'},
+      {cat:'marketing', icon:'📢', text:'Відеопромо "Як замовити з США за 5 кроків" — 120K переглядів', time:'2w ago', color:'#f97316'},
+    ],
+    partnerships:{
+      strategic:[
+        {name:'Amazon',type:'Склад Delaware',since:'2018',logo:'AM',bg:'#f97316'},
+        {name:'eBay',type:'Партнерська програма',since:'2019',logo:'EB',bg:'#e43137'},
+        {name:'Best Buy',type:'Корпоративний акаунт',since:'2022',logo:'BB',bg:'#0046be'},
+        {name:'PrivatBank',type:'Розстрочка',since:'2021',logo:'PB',bg:'#10b981'},
+      ],
+      channels:{
+        online:['easyxpress.com.ua','YouTube-канал','Instagram','Партнерські блоги'],
+        offline:['Два офіси в Києві','Склад у Brooklyn (NYC)','Delaware tax-free warehouse'],
+        marketplace:['Amazon (склад)','eBay (партнер)'],
+      },
+      b2b:35,b2c:65,
+      notes:'Переважно B2C: приватні покупці зі США. Корпоративний B2B-напрям активно зростає через особистих менеджерів.',
+    },
+    marketing:{
+      channels:[
+        {name:'SEO',score:74,color:'#10b981'},{name:'PPC',score:85,color:'#3b82f6'},
+        {name:'Social',score:68,color:'#ec4899'},{name:'PR',score:45,color:'#f97316'},{name:'Email',score:72,color:'#E84520'},
+      ],
+      content:{
+        types:['YouTube-відео','SEO-статті','FAQ про митницю','Гайди з шопінгу в США','Відгуки клієнтів'],
+        frequency:'3–4 пости/тиждень',
+        engagement:'Високий — 150–200 переглядів відео/добу',
+        topPiece:'"Як замовити з Amazon в Україну" — 380K переглядів на YouTube',
+      },
+      messaging:{
+        keyMessages:['12 років доставки зі США','99% задоволених клієнтів','Відеозйомка кожної посилки'],
+        tov:'Простий, дружній, орієнтований на споживача. Акцент на безпеці та прозорості.',
+        story:'Робить міжнародний шопінг зрозумілим для звичайного покупця — знімає страх і складність.',
+      },
+      media:{
+        shareOfVoice:22,
+        prActivity:'Помірна — огляди в блогах про шопінг, YouTube-колаборації.',
+        mentions:['Shoppster.ua','Rozetka Блог','YouTube "Посилки зі США"','Telegram "Шопінг в США"'],
+      },
+      influencers:[
+        {name:'@shopping_usa_ua',role:'Шопінг-інфлюенсер',platform:'Instagram',reach:'62K'},
+        {name:'Valeria Kovalchuk',role:'Lifestyle blogger',platform:'YouTube',reach:'120K'},
+        {name:'Telegram "Покупки з-за кордону"',role:'Канал',platform:'Telegram',reach:'34K'},
+      ],
+    },
+    digital:{
+      web:{monthlyTraffic:'58K',sources:{organic:42,paid:38,social:11,direct:9},bounceRate:'36%',avgSession:'3m 12s'},
+      seo:{organicVisibility:74,domainAuthority:41,topKeywords:['доставка зі сша','замовлення з amazon в україну','посилка з америки'],backlinks:'4.8K',rankingPages:820},
+      paid:{platforms:['Google Search','Google Display','YouTube'],budget:'₴120K/міс',creatives:18,targeting:'Жінки та чоловіки 22–45, онлайн-покупці, інтерес до шопінгу за кордоном',topAd:'"Замов з США від $6.50/кг — доставка 4–9 днів"'},
+      social:[
+        {name:'Instagram',followers:'14.2K',growth:'+4.1%',engagement:'2.8%',posts:4},
+        {name:'YouTube',followers:'8.4K',growth:'+6.2%',engagement:'5.1%',posts:2},
+        {name:'Telegram',followers:'11.8K',growth:'+8.9%',engagement:'7.2%',posts:5},
+        {name:'Facebook',followers:'9.1K',growth:'+1.8%',engagement:'1.9%',posts:3},
+      ],
+      email:{frequency:'Щотижнево + тригерні листи',campaigns:['Акції від партнерів','Нові тарифи','Поради зі шопінгу','Відстеження посилок'],listSize:'~28K підписників'},
+    },
+  },
+  {
+    id:3, name:'Meest China', domain:'meest.cn', color:'#e3f2fd', logoColor:'#1565c0',
+    threat:'Medium', score:8780, change:+112,
+    seo:81, social:74, ads:62, reviews:4.3, pricing:'від $3.40/пос.',
+    lastUpdated:'3h ago', desc:'Бренд Meest з 2014 р. Доставка з Азії (CN/KR/JP). Партнер Rozetka.',
+    date:'23 Mar 2026', avs:['M','C'],
+    activity:[
+      {cat:'partnership', icon:'🤝', text:'Розширено партнерство з Rozetka — нова спільна промокампанія', time:'6h ago', color:'#3b82f6'},
+      {cat:'seo', icon:'🔍', text:'+18 нових ключових слів у топ-10 Google.ua', time:'2d ago', color:'#10b981'},
+      {cat:'product', icon:'⚡', text:'Нові склади в Японії — відкриті для реєстрації', time:'3d ago', color:'#E84520'},
+      {cat:'pricing', icon:'💰', text:'Акція: авіадоставка від $3.40 для посилок до 2 кг', time:'5d ago', color:'#ef4444'},
+      {cat:'marketing', icon:'📢', text:'Колаборація з Onitsuka Tiger — офіційна закупівля взуття', time:'1w ago', color:'#f97316'},
+      {cat:'seo', icon:'🔍', text:'Гайд "Як замовити з Taobao" — 5K+ читачів за тиждень', time:'2w ago', color:'#10b981'},
+    ],
+    partnerships:{
+      strategic:[
+        {name:'Rozetka',type:'E-commerce партнер',since:'2020',logo:'RZ',bg:'#f97316'},
+        {name:'Onitsuka Tiger',type:'Офіційний закупник',since:'2023',logo:'OT',bg:'#1a1a2e'},
+        {name:'1688.com',type:'Маркетплейс-партнер',since:'2019',logo:'16',bg:'#e63a2e'},
+        {name:'Taobao',type:'Маркетплейс-партнер',since:'2018',logo:'TB',bg:'#ff6900'},
+      ],
+      channels:{
+        online:['meest.cn','Rozetka (партнер)','Taobao/1688 напряму','Viber/Telegram-бот'],
+        offline:['Пункти видачі Meest по Україні','Склади Guangzhou/HK/JP/KR'],
+        marketplace:['Rozetka','Prom.ua','Taobao (закупівля)'],
+      },
+      b2b:45,b2c:55,
+      notes:'Сильний B2C через бренд Meest та мережу ПВЗ. B2B-сегмент росте через комерційні вантажі (30+ кг).',
+    },
+    marketing:{
+      channels:[
+        {name:'SEO',score:81,color:'#10b981'},{name:'PPC',score:62,color:'#3b82f6'},
+        {name:'Social',score:74,color:'#ec4899'},{name:'PR',score:68,color:'#f97316'},{name:'Email',score:55,color:'#E84520'},
+      ],
+      content:{
+        types:['SEO-гайди','Відгуки на Rozetka','Соцмережі','Email-розсилки','Партнерські матеріали'],
+        frequency:'3–4 пости/тиждень',
+        engagement:'Середній — Rozetka-відгуки формують основну репутацію',
+        topPiece:'SEO-гайд "Як замовити з Taobao 2026"',
+      },
+      messaging:{
+        keyMessages:['Купуйте більше — платіть менше','Доставка з Азії за найнижчою ціною','Бренд Meest — 30 років на ринку'],
+        tov:'Економний, практичний. Акцент на ціні та вигоді для клієнта.',
+        story:'Використовує силу бренду Meest Group — позиціонується як надійна частина великої мережі.',
+      },
+      media:{
+        shareOfVoice:24,
+        prActivity:'Активна — наявність у медіа через бренд Meest Group.',
+        mentions:['Mind.ua','Rozetka Blog','Логістика в Україні','Новини Meest Group'],
+      },
+      influencers:[
+        {name:'@chinabuyer_ua',role:'Шопінг з Китаю',platform:'Instagram',reach:'38K'},
+        {name:'Meest Group',role:'Корпоративний бренд',platform:'Multi',reach:'Вся мережа'},
+        {name:'Telegram "1688 Гайди"',role:'Спільнота',platform:'Telegram',reach:'21K'},
+      ],
+    },
+    digital:{
+      web:{monthlyTraffic:'35K',sources:{organic:55,paid:18,social:15,direct:12},bounceRate:'39%',avgSession:'2m 44s'},
+      seo:{organicVisibility:81,domainAuthority:52,topKeywords:['meest china','доставка з таобао','замовлення з китаю meest'],backlinks:'6.1K',rankingPages:940},
+      paid:{platforms:['Google Search','Facebook'],budget:'₴65K/міс',creatives:8,targeting:'Покупці маркетплейсів 20–40 років, інтерес до Китаю та Азії',topAd:'"Доставка з Taobao від $3.40" — реєстрація на сайті'},
+      social:[
+        {name:'Instagram',followers:'11.2K',growth:'+3.4%',engagement:'2.9%',posts:4},
+        {name:'Facebook',followers:'16.8K',growth:'+1.2%',engagement:'2.1%',posts:3},
+        {name:'Telegram',followers:'14.5K',growth:'+6.8%',engagement:'5.9%',posts:5},
+        {name:'YouTube',followers:'4.2K',growth:'+4.1%',engagement:'3.8%',posts:1},
+      ],
+      email:{frequency:'2× на місяць',campaigns:['Акції Rozetka','Новини тарифів','Сезонні пропозиції','Новини маркетплейсів'],listSize:'~22K підписників'},
+    },
+  },
+  {
+    id:4, name:'SmartTrek', domain:'smarttrek.com.ua', color:'#e0f7fa', logoColor:'#0277bd',
+    threat:'Medium', score:8290, change:+67,
+    seo:62, social:58, ads:72, reviews:5.0, pricing:'від $1/кг',
+    lastUpdated:'5h ago', desc:'Без посередників, найнижчі ціни. 9100+ замовлень/рік, Google-рейтинг 5.0.',
+    date:'22 Mar 2026', avs:['S','T'],
+    activity:[
+      {cat:'pricing', icon:'💰', text:'Акція: безкоштовне зберігання до 45 днів замість 30', time:'8h ago', color:'#ef4444'},
+      {cat:'marketing', icon:'📢', text:'Запущено кампанію в Facebook — нові відгуки клієнтів', time:'2d ago', color:'#f97316'},
+      {cat:'seo', icon:'🔍', text:'Нові посадкові сторінки для Одеси, Хмельницького та Харкова', time:'4d ago', color:'#10b981'},
+      {cat:'product', icon:'⚡', text:'Оновлено мобільний застосунок — push-сповіщення трекінгу', time:'1w ago', color:'#E84520'},
+      {cat:'partnership', icon:'🤝', text:'Нові партнери-постачальники у Shenzhen та Guangzhou', time:'1w ago', color:'#3b82f6'},
+      {cat:'seo', icon:'🔍', text:'Кейс "Як ми доставили 500 кг одягу для ФОП" — топ видача', time:'2w ago', color:'#10b981'},
+    ],
+    partnerships:{
+      strategic:[
+        {name:'Taobao',type:'Закупівля',since:'2019',logo:'TB',bg:'#ff6900'},
+        {name:'Alibaba',type:'B2B закупівля',since:'2018',logo:'AL',bg:'#f97316'},
+        {name:'1688.com',type:'Гуртові постачання',since:'2020',logo:'16',bg:'#e63a2e'},
+        {name:'Nova Poshta',type:'Остання миля',since:'2021',logo:'NP',bg:'#ef4444'},
+      ],
+      channels:{
+        online:['smarttrek.com.ua','Instagram','Facebook','Viber'],
+        offline:['Офіси в Одесі, Києві, Хмельницькому','Склади Guangzhou та Shenzhen'],
+        marketplace:['Prom.ua (рекламація)'],
+      },
+      b2b:60,b2c:40,
+      notes:'Баланс B2B/B2C. ФОП та малий бізнес — ключовий сегмент. Конкурентна перевага — ціна.',
+    },
+    marketing:{
+      channels:[
+        {name:'SEO',score:62,color:'#10b981'},{name:'PPC',score:72,color:'#3b82f6'},
+        {name:'Social',score:58,color:'#ec4899'},{name:'PR',score:32,color:'#f97316'},{name:'Email',score:42,color:'#E84520'},
+      ],
+      content:{
+        types:['Відгуки клієнтів','Facebook-пости','Фото товарів','Кейси доставки'],
+        frequency:'2–3 пости/тиждень',
+        engagement:'Помірний — акцент на Google-відгуках (5.0 рейтинг)',
+        topPiece:'Відгуки у Google Maps — 500+ коментарів',
+      },
+      messaging:{
+        keyMessages:['Найнижчі ціни без посередників','9100+ замовлень — перевірені роками','Особистий менеджер для кожного клієнта'],
+        tov:'Простий, ціновий. "Прямо і чесно" — без зайвих обіцянок.',
+        story:'Позиціонується як компанія, що прибрала посередників і передає цінову вигоду клієнту.',
+      },
+      media:{
+        shareOfVoice:14,
+        prActivity:'Слабка — переважно відгуки на Google та сарафанне радіо.',
+        mentions:['Відгуки на Google','Prom.ua рейтинги','Форум ФОП'],
+      },
+      influencers:[
+        {name:'@biznes_odessa',role:'Бізнес-спільнота Одеса',platform:'Instagram',reach:'18K'},
+        {name:'Форум "Імпорт для ФОП"',role:'Спільнота',platform:'Facebook',reach:'12K'},
+      ],
+    },
+    digital:{
+      web:{monthlyTraffic:'22K',sources:{organic:38,paid:42,social:12,direct:8},bounceRate:'46%',avgSession:'2m 18s'},
+      seo:{organicVisibility:62,domainAuthority:28,topKeywords:['доставка вантажів з китаю одеса','дешева доставка з китаю','smarttrek'],backlinks:'1.8K',rankingPages:380},
+      paid:{platforms:['Google Search','Facebook Ads'],budget:'₴55K/міс',creatives:10,targeting:'ФОП, малий бізнес, інтернет-магазини — Одеса, Київ, Хмельницький',topAd:'"Доставка з Китаю від $1/кг — без прихованих комісій"'},
+      social:[
+        {name:'Instagram',followers:'6.4K',growth:'+4.8%',engagement:'3.4%',posts:3},
+        {name:'Facebook',followers:'8.2K',growth:'+2.2%',engagement:'2.8%',posts:3},
+        {name:'Viber',followers:'3.1K',growth:'+5.1%',engagement:'8.2%',posts:4},
+      ],
+      email:{frequency:'Щомісяця',campaigns:['Акції сезону','Нові тарифи','Запрошення до чату'],listSize:'~5K підписників'},
+    },
+  },
+  {
+    id:5, name:'DifFreight', domain:'diffreight.com', color:'#e8f5e9', logoColor:'#1b5e20',
+    threat:'Medium', score:7950, change:+42,
+    seo:55, social:48, ads:58, reviews:4.5, pricing:'від $7.50/кг',
+    lastUpdated:'6h ago', desc:'5+ років, 27+ країн, 1200+ продавців. Amazon FBA фулфілмент.',
+    date:'21 Mar 2026', avs:['D','F'],
+    activity:[
+      {cat:'product', icon:'⚡', text:'Запущено новий модуль Amazon FBA фулфілменту для UA-продавців', time:'12h ago', color:'#E84520'},
+      {cat:'marketing', icon:'📢', text:'Вебінар "Логістика для Amazon-продавців" — 320 реєстрацій', time:'3d ago', color:'#f97316'},
+      {cat:'partnership', icon:'🤝', text:'Нова угода зі складом у Польщі для авто-перевезень', time:'5d ago', color:'#3b82f6'},
+      {cat:'seo', icon:'🔍', text:'Стаття "Доставка до Amazon FBA з України" — топ-5 Google', time:'1w ago', color:'#10b981'},
+      {cat:'pricing', icon:'💰', text:'Оновлено калькулятор тарифів — нові ставки LTL Європа', time:'2w ago', color:'#ef4444'},
+    ],
+    partnerships:{
+      strategic:[
+        {name:'Amazon FBA',type:'Фулфілмент партнер',since:'2022',logo:'AM',bg:'#f97316'},
+        {name:'Prom.ua',type:'Маркетплейс',since:'2021',logo:'PR',bg:'#3b82f6'},
+        {name:'Rozetka',type:'Логістичний партнер',since:'2022',logo:'RZ',bg:'#f97316'},
+        {name:'Alibaba',type:'Закупівля Китай',since:'2020',logo:'AL',bg:'#e85c1a'},
+      ],
+      channels:{
+        online:['diffreight.com','LinkedIn','Facebook','Email-розсилка'],
+        offline:['Офіс у Києві','Склади CN/USA/EU','Виставки e-commerce'],
+        marketplace:['Amazon FBA','Rozetka','Prom.ua'],
+      },
+      b2b:95,b2c:5,
+      notes:'Майже чистий B2B. Ніша: е-commerce продавці, які продають на маркетплейсах UA та закордон.',
+    },
+    marketing:{
+      channels:[
+        {name:'SEO',score:55,color:'#10b981'},{name:'PPC',score:58,color:'#3b82f6'},
+        {name:'Social',score:48,color:'#ec4899'},{name:'PR',score:62,color:'#f97316'},{name:'Email',score:68,color:'#E84520'},
+      ],
+      content:{
+        types:['Вебінари','Кейси','Email-розсилки','LinkedIn-пости','SEO-гайди'],
+        frequency:'1–2 пости/тиждень',
+        engagement:'Низький у соцмережах, але high у вебінарах (300+ учасників)',
+        topPiece:'Серія вебінарів "Amazon FBA для українського бізнесу"',
+      },
+      messaging:{
+        keyMessages:['Повний логістичний цикл для e-commerce','Amazon FBA зі складів в США та Китаї','30+ фахівців у вашому розпорядженні'],
+        tov:'Бізнес-орієнтований, технічний. Мова цифр і конкретних рішень.',
+        story:'Фокус на складній B2B-логістиці — "ми беремо на себе всю операційну складність".',
+      },
+      media:{
+        shareOfVoice:12,
+        prActivity:'Помірна — акцент на вебінарах та LinkedIn.',
+        mentions:['E-commerce Ukraine','Amazon Seller Forum UA','LinkedIn posts'],
+      },
+      influencers:[
+        {name:'Amazon UA Community',role:'Спільнота продавців',platform:'Facebook',reach:'8K'},
+        {name:'@ecommerce_ukraine',role:'E-commerce медіа',platform:'Telegram',reach:'22K'},
+      ],
+    },
+    digital:{
+      web:{monthlyTraffic:'14K',sources:{organic:32,paid:28,social:14,direct:26},bounceRate:'38%',avgSession:'3m 44s'},
+      seo:{organicVisibility:55,domainAuthority:24,topKeywords:['amazon fba україна','доставка для amazon','логістика сша'],backlinks:'1.2K',rankingPages:220},
+      paid:{platforms:['Google Search','LinkedIn'],budget:'₴40K/міс',creatives:7,targeting:'E-commerce підприємці, Amazon-продавці, маркетплейс-бізнес',topAd:'"Amazon FBA з України — від $7.50/кг"'},
+      social:[
+        {name:'LinkedIn',followers:'2.8K',growth:'+5.4%',engagement:'4.8%',posts:2},
+        {name:'Facebook',followers:'4.2K',growth:'+1.8%',engagement:'2.2%',posts:2},
+        {name:'Telegram',followers:'3.6K',growth:'+9.2%',engagement:'7.1%',posts:3},
+      ],
+      email:{frequency:'Щотижня — корисний контент для B2B',campaigns:['Вебінари та події','Нові маршрути','Партнерські акції','Кейси клієнтів'],listSize:'~8K підписників'},
+    },
+  },
+  {
+    id:6, name:'TurboAvia', domain:'turboavia.com', color:'#fff8e1', logoColor:'#f57f17',
+    threat:'Low', score:7420, change:-28,
+    seo:48, social:52, ads:44, reviews:4.1, pricing:'за запитом',
+    lastUpdated:'8h ago', desc:'Авіа/море/залізниця/авто. Офіси Київ/Guangzhou/Incheon. Платформа Turbo.',
+    date:'20 Mar 2026', avs:['T','A'],
+    activity:[
+      {cat:'product', icon:'⚡', text:'Оновлено трекінг-платформу Turbo — новий інтерфейс', time:'1d ago', color:'#E84520'},
+      {cat:'seo', icon:'🔍', text:'Нові сторінки послуг для Кореї та Таїланду', time:'4d ago', color:'#10b981'},
+      {cat:'marketing', icon:'📢', text:'Активність у Telegram — розклад рейсів та оголошення', time:'5d ago', color:'#f97316'},
+      {cat:'pricing', icon:'💰', text:'Нові умови для акумуляторів та небезпечних вантажів', time:'1w ago', color:'#ef4444'},
+      {cat:'partnership', icon:'🤝', text:'Нова угода з корейським агентом в Incheon', time:'2w ago', color:'#3b82f6'},
+    ],
+    partnerships:{
+      strategic:[
+        {name:'Cainiao (Alibaba)',type:'Авіалогістика',since:'2022',logo:'CA',bg:'#e63a2e'},
+        {name:'Incheon Logistics',type:'Корейський агент',since:'2021',logo:'IL',bg:'#1a1a2e'},
+        {name:'PrivatBank',type:'Валютні перекази',since:'2023',logo:'PB',bg:'#10b981'},
+      ],
+      channels:{
+        online:['turboavia.com','Telegram-канал','Viber','Instagram'],
+        offline:['Офіс Київ','Склад Guangzhou','Офіс Incheon (KR)'],
+        marketplace:['Pinduoduo (закупівля)','Taobao (закупівля)'],
+      },
+      b2b:55,b2c:45,
+      notes:'Збалансований B2B/B2C. Нішева перевага — залізниця з Китаю та небезпечні вантажі.',
+    },
+    marketing:{
+      channels:[
+        {name:'SEO',score:48,color:'#10b981'},{name:'PPC',score:44,color:'#3b82f6'},
+        {name:'Social',score:52,color:'#ec4899'},{name:'PR',score:28,color:'#f97316'},{name:'Email',score:35,color:'#E84520'},
+      ],
+      content:{
+        types:['Telegram-пости','Instagram Stories','Прайс-листівки','SEO-сторінки послуг'],
+        frequency:'3–5 Telegram-постів/тиждень',
+        engagement:'Середній у Telegram (основний канал комунікації)',
+        topPiece:'Telegram-канал з розкладом рейсів — 6K підписників',
+      },
+      messaging:{
+        keyMessages:['Авіа, море, залізниця — всі напрямки','Склади в Китаї та Кореї','Відповідальність і повага до вантажу'],
+        tov:'Функціональний, лаконічний. Мінімум маркетингу, максимум конкретики.',
+        story:'Позиціонується через надійність і багатомодальність — "дешевше і швидше ніж конкуренти".',
+      },
+      media:{
+        shareOfVoice:8,
+        prActivity:'Дуже слабка — переважно Telegram та сарафанне радіо.',
+        mentions:['Telegram-канали логістики','Форуми ФОП','Viber-групи'],
+      },
+      influencers:[
+        {name:'Telegram "Логістика CN-UA"',role:'Галузева спільнота',platform:'Telegram',reach:'15K'},
+        {name:'Форум "Вантажі з Кореї"',role:'Спільнота',platform:'Facebook',reach:'5K'},
+      ],
+    },
+    digital:{
+      web:{monthlyTraffic:'9K',sources:{organic:28,paid:22,social:32,direct:18},bounceRate:'52%',avgSession:'1m 48s'},
+      seo:{organicVisibility:48,domainAuthority:18,topKeywords:['turboavia доставка','авіадоставка з кореї','доставка з таїланду'],backlinks:'680',rankingPages:140},
+      paid:{platforms:['Google Search'],budget:'₴18K/міс',creatives:4,targeting:'Покупці маркетплейсів CN/KR, ФОП',topAd:'"Доставка з Кореї та Китаю — Turbo-трекінг"'},
+      social:[
+        {name:'Telegram',followers:'6.2K',growth:'+4.8%',engagement:'6.4%',posts:5},
+        {name:'Instagram',followers:'3.8K',growth:'+2.1%',engagement:'2.6%',posts:3},
+        {name:'Viber',followers:'2.1K',growth:'+1.8%',engagement:'5.2%',posts:4},
+      ],
+      email:{frequency:'Рідко — лише тригерні сповіщення',campaigns:['Трекінг посилок','Розклад рейсів','Акційні пропозиції'],listSize:'~2K підписників'},
+    },
+  },
+];
+
+const CHANGES = [
+  {id:1,icon:'🤝',comp:'Meest China',type:'Партнерство',desc:'Розширено угоду з Rozetka — нова промокампанія',time:'6h ago',conf:95,color:'#e3f2fd'},
+  {id:2,icon:'💰',comp:'EasyXpress',type:'Ціни',desc:'Знижено тариф Economy зі США до $6.50/кг',time:'4h ago',conf:91,color:'#ede7f6'},
+  {id:3,icon:'📢',comp:'Wingo',type:'Реклама',desc:'Instagram-кампанія "Перше замовлення -10%"',time:'3h ago',conf:88,color:'#fce4ec'},
+  {id:4,icon:'⚡',comp:'DifFreight',type:'Продукт',desc:'Запущено модуль Amazon FBA фулфілменту',time:'12h ago',conf:79,color:'#e8f5e9'},
+];
+
+const ALERTS = [
+  {id:1,sev:'critical',comp:'Meest China',title:'Партнерство з Rozetka розширено',desc:'Нова спільна промокампанія — потенційна загроза охопленню B2C-сегменту',time:'6h ago',read:false},
+  {id:2,sev:'high',comp:'EasyXpress',title:'Зниження тарифу Economy зі США',desc:'Новий тариф від $6.50/кг — агресивна цінова стратегія у B2C',time:'4h ago',read:false},
+  {id:3,sev:'high',comp:'Wingo',title:'Нова рекламна кампанія в Instagram',desc:'Промо "Перше замовлення -10%" — цільовий B2C-сегмент, Київ та обл.',time:'3h ago',read:true},
+  {id:4,sev:'medium',comp:'DifFreight',title:'Amazon FBA модуль запущено',desc:'Новий продукт для e-commerce продавців — розширення цільової аудиторії',time:'12h ago',read:true},
+  {id:5,sev:'medium',comp:'SmartTrek',title:'Безкоштовне зберігання до 45 днів',desc:'Акція: збільшено термін безкоштовного зберігання — конкурентна перевага',time:'8h ago',read:true},
+  {id:6,sev:'low',comp:'TurboAvia',title:'Оновлено Turbo-трекінг платформу',desc:'Новий інтерфейс відстеження посилок — покращення UX',time:'1d ago',read:true},
+];
+
+const CHART_WEEKLY = {labels:['Нд','Пн','Вт','Ср','Чт','Пт','Сб'],seo:[58,64,67,65,71,68,74],social:[42,48,45,54,51,58,56],ads:[28,32,38,34,42,46,44]};
+const CHART_MONTHLY = {labels:['Жов','Лис','Гру','Січ','Лют','Бер','Кві'],seo:[52,56,61,58,68,66,74],social:[35,39,42,47,52,55,58],ads:[22,28,32,37,35,41,45]};
+
+const TIME_RANGES = [
+  {k:'1d',  lbl:'Сьогодні',   days:1},
+  {k:'7d',  lbl:'7 днів',     days:7},
+  {k:'30d', lbl:'30 днів',    days:30},
+  {k:'3m',  lbl:'3 місяці',   days:90},
+  {k:'6m',  lbl:'6 місяців',  days:180},
+  {k:'1y',  lbl:'Рік',        days:365},
+];
+
+const CHART_DATA = {
+  '1d': {labels:['9:00','11:00','13:00','15:00','17:00','19:00','21:00'],seo:[62,64,63,67,65,68,66],social:[42,44,43,46,45,48,47],ads:[28,29,30,31,30,32,31]},
+  '7d': {labels:['Нд','Пн','Вт','Ср','Чт','Пт','Сб'],seo:[58,64,67,65,71,68,74],social:[42,48,45,54,51,58,56],ads:[28,32,38,34,42,46,44]},
+  '30d': {labels:['Тиж 1','Тиж 2','Тиж 3','Тиж 4'],seo:[62,67,71,74],social:[48,51,55,58],ads:[30,35,40,45]},
+  '3m': {labels:['Грудень','Січень','Лютий','Березень'],seo:[58,62,68,74],social:[44,48,54,58],ads:[26,32,38,45]},
+  '6m': {labels:['Жов','Лис','Гру','Січ','Лют','Бер'],seo:[52,56,61,58,68,74],social:[35,39,42,47,52,58],ads:[22,28,32,37,35,45]},
+  '1y': {labels:['Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру','Січ','Лют','Бер'],seo:[45,48,52,55,58,55,52,56,61,58,68,74],social:[30,33,36,39,42,40,35,39,42,47,52,58],ads:[18,22,25,28,30,27,22,28,32,37,35,45]},
+  'custom': {labels:['Поч.','Сер.','Кін.'],seo:[60,66,74],social:[44,50,58],ads:[28,36,44]},
+};
+
+const filterActivities = (items, rangeDays) => {
+  if(!rangeDays || rangeDays >= 365) return items;
+  return items.filter(a => {
+    const t = a.time;
+    if(t.includes('h ago')) return true;
+    const n = parseFloat(t) || 0;
+    if(t.includes('d ago')) return n <= rangeDays;
+    if(t.includes('w ago')) return n * 7 <= rangeDays;
+    return true;
+  });
+};
+
+const REPORTS = [
+  {id:1,icon:'📊',title:'Тижневий дайджест',date:'24 Mar 2026',type:'Щотижневий',pages:8,status:'ready'},
+  {id:2,icon:'📈',title:'Q1 Бенчмарк: логістика UA',date:'1 Mar 2026',type:'Квартальний',pages:24,status:'ready'},
+  {id:3,icon:'💰',title:'Аналіз тарифів конкурентів',date:'20 Mar 2026',type:'Разовий',pages:12,status:'ready'},
+  {id:4,icon:'🔍',title:'SEO-аналіз: доставка з Китаю',date:'15 Mar 2026',type:'Щомісячний',pages:18,status:'ready'},
+  {id:5,icon:'⚡',title:'Дайджест Квітень 2026',date:'Генерується...',type:'Щотижневий',pages:'—',status:'gen'},
+];
+
+const SEO_DATA=[{comp:'Meest China',rank:1,keywords:940,traffic:'35K',backlinks:'6.1K',trend:'+18%'},{comp:'Wingo',rank:3,keywords:680,traffic:'42K',backlinks:'3.2K',trend:'+12%'},{comp:'EasyXpress',rank:4,keywords:820,traffic:'58K',backlinks:'4.8K',trend:'+9%'},{comp:'SmartTrek',rank:7,keywords:380,traffic:'22K',backlinks:'1.8K',trend:'+5%'},{comp:'DifFreight',rank:11,keywords:220,traffic:'14K',backlinks:'1.2K',trend:'+3%'},{comp:'TurboAvia',rank:16,keywords:140,traffic:'9K',backlinks:'680',trend:'-4%'}];
+const ADS_DATA=[{comp:'EasyXpress',platform:'Google/YouTube',spend:'₴120K',creatives:18,ctr:'3.8%',trend:'+11%'},{comp:'Wingo',platform:'Google/Facebook',spend:'₴85K',creatives:12,ctr:'3.1%',trend:'+7%'},{comp:'Meest China',platform:'Google/Facebook',spend:'₴65K',creatives:8,ctr:'2.9%',trend:'+6%'},{comp:'SmartTrek',platform:'Google/Facebook',spend:'₴55K',creatives:10,ctr:'2.6%',trend:'+4%'},{comp:'DifFreight',platform:'Google/LinkedIn',spend:'₴40K',creatives:7,ctr:'2.2%',trend:'+2%'},{comp:'TurboAvia',platform:'Google',spend:'₴18K',creatives:4,ctr:'1.8%',trend:'-6%'}];
+const SOCIAL_DATA=[{comp:'Meest China',followers:'46.7K',growth:'+3.8%',engagement:'3.4%',posts:13},{comp:'Wingo',followers:'43.5K',growth:'+4.2%',engagement:'3.6%',posts:17},{comp:'EasyXpress',followers:'43.5K',growth:'+5.8%',engagement:'4.2%',posts:14},{comp:'SmartTrek',followers:'17.7K',growth:'+3.8%',engagement:'3.1%',posts:10},{comp:'TurboAvia',followers:'12.1K',growth:'+3.2%',engagement:'4.6%',posts:12},{comp:'DifFreight',followers:'10.6K',growth:'+4.2%',engagement:'4.2%',posts:7}];
+
+const ACT_CATS = [
+  {k:'all',lbl:'Всі',color:'#1a1a2e'},
+  {k:'pricing',lbl:'Ціни',color:'#ef4444'},
+  {k:'product',lbl:'Продукт',color:'#E84520'},
+  {k:'marketing',lbl:'Маркетинг',color:'#f97316'},
+  {k:'seo',lbl:'SEO',color:'#10b981'},
+  {k:'partnership',lbl:'Партнерства',color:'#3b82f6'},
+];
+
+/* ── ICONS ── */
+const Ico = ({n,s=18,c='currentColor'}) => {
+  const d = {
+    home:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+    bell:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
+    search:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+    users:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+    chart:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
+    file:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,
+    settings:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+    plus:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    dl:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
+    x:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    trend:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
+    eye:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+    cal:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+    ext:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>,
+    back:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
+    link:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
+  };
+  return d[n] || null;
+};
+
+/* ── SVG LINE CHART ── */
+const LineChart = ({ data }) => {
+  const [hov, setHov] = useState(null);
+  const W=560,H=170,PL=32,PR=16,PT=18,PB=26;
+  const cW=W-PL-PR,cH=H-PT-PB;
+  const allV=[...data.seo,...data.social,...data.ads];
+  const maxV=Math.max(...allV),minV=Math.min(...allV)-5;
+  const range=maxV-minV||1;
+  const xStep=cW/(data.labels.length-1);
+  const toX=i=>PL+i*xStep;
+  const toY=v=>PT+cH-((v-minV)/range)*cH;
+  const mkPath=vals=>{
+    const pts=vals.map((v,i)=>({x:toX(i),y:toY(v)}));
+    let d=`M ${pts[0].x} ${pts[0].y}`;
+    for(let i=1;i<pts.length;i++){
+      const cp1x=pts[i-1].x+(pts[i].x-pts[i-1].x)*.4;
+      const cp2x=pts[i].x-(pts[i].x-pts[i-1].x)*.4;
+      d+=` C ${cp1x} ${pts[i-1].y} ${cp2x} ${pts[i].y} ${pts[i].x} ${pts[i].y}`;
+    }
+    return d;
+  };
+  const mkArea=vals=>{
+    const p=mkPath(vals);
+    const pts=vals.map((v,i)=>({x:toX(i),y:toY(v)}));
+    return `${p} L ${pts[pts.length-1].x} ${PT+cH} L ${pts[0].x} ${PT+cH} Z`;
+  };
+  const lines=[{k:'seo',vals:data.seo,col:'#E84520',lbl:'SEO'},{k:'soc',vals:data.social,col:'#ec4899',lbl:'Social'},{k:'ads',vals:data.ads,col:'#3b82f6',lbl:'Ads'}];
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:'auto',overflow:'visible'}}>
+      <defs>{lines.map(l=><linearGradient key={l.k} id={`g-${l.k}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={l.col} stopOpacity=".18"/><stop offset="100%" stopColor={l.col} stopOpacity=".02"/></linearGradient>)}</defs>
+      {[0,25,50,75,100].map(pct=>{const y=PT+cH-(pct/100)*cH;return <line key={pct} x1={PL} y1={y} x2={W-PR} y2={y} stroke="#e5e7eb" strokeWidth="1" strokeDasharray="4 3"/>;
+      })}
+      {data.labels.map((lbl,i)=><text key={i} x={toX(i)} y={H-5} textAnchor="middle" fontSize="10" fill="#9ca3af" fontFamily="DM Sans">{lbl}</text>)}
+      {lines.map(l=><path key={`a${l.k}`} d={mkArea(l.vals)} fill={`url(#g-${l.k})`}/>)}
+      {lines.map(l=><path key={`l${l.k}`} d={mkPath(l.vals)} fill="none" stroke={l.col} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>)}
+      {hov!==null && lines.map(l=>{const x=toX(hov),y=toY(l.vals[hov]);return <g key={`h${l.k}`}><circle cx={x} cy={y} r="4.5" fill="#fff" stroke={l.col} strokeWidth="2.5"/></g>;})}
+      {hov!==null && (()=>{
+        const x=toX(hov),tipW=96,tipH=66;
+        const tx=Math.min(Math.max(x-tipW/2,PL),W-PR-tipW);
+        const ty=PT-tipH-6;
+        return <g><rect x={tx} y={ty} width={tipW} height={tipH} rx="8" fill="#1a1a2e" opacity=".92"/><text x={tx+tipW/2} y={ty+14} textAnchor="middle" fontSize="10" fill="#9ca3af" fontFamily="DM Sans">{data.labels[hov]}</text>{lines.map((l,li)=><text key={l.k} x={tx+8} y={ty+28+li*13} fontSize="10" fill={l.col} fontFamily="DM Sans">{l.lbl}: {l.vals[hov]}%</text>)}</g>;
+      })()}
+      {data.labels.map((_,i)=><rect key={i} x={toX(i)-xStep/2} y={PT} width={xStep} height={cH} fill="transparent" onMouseEnter={()=>setHov(i)} onMouseLeave={()=>setHov(null)} style={{cursor:'crosshair'}}/>)}
+    </svg>
+  );
+};
+
+/* ── DATE RANGE PICKER ── */
+const DateRangePicker = ({range, setRange}) => {
+  const [open, setOpen] = useState(false);
+  const [showCustom, setShowCustom] = useState(false);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const wrapRef = useRef(null);
+
+  useEffect(() => {
+    const handler = e => { if(wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const select = r => { setRange(r); setOpen(false); setShowCustom(false); };
+
+  const applyCustom = () => {
+    if(!fromDate || !toDate) return;
+    const days = Math.max(1, Math.round((new Date(toDate) - new Date(fromDate)) / 86400000));
+    const fmt = d => new Date(d).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'2-digit'});
+    setRange({k:'custom', lbl:`${fmt(fromDate)} – ${fmt(toDate)}`, days});
+    setOpen(false); setShowCustom(false);
+  };
+
+  const btnLbl = range.lbl || TIME_RANGES.find(r=>r.k===range.k)?.lbl || '7 днів';
+
+  return (
+    <div className="drp-wrap" ref={wrapRef}>
+      <button className={`drp-btn ${open?'open':''}`} onClick={()=>setOpen(o=>!o)}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span className="drp-btn-lbl">{btnLbl}</span>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      {open && (
+        <div className="drp-panel">
+          <div className="drp-label">Пресети</div>
+          <div className="drp-presets">
+            {TIME_RANGES.map(r => (
+              <button key={r.k} className={`drp-preset ${range.k===r.k?'active':''}`}
+                onClick={()=>select(r)}>{r.lbl}</button>
+            ))}
+          </div>
+          <div className="drp-divider"/>
+          <button className={`drp-custom-toggle ${showCustom?'active':''}`}
+            onClick={()=>setShowCustom(s=>!s)}>
+            Свій діапазон
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points={showCustom?"18 15 12 9 6 15":"6 9 12 15 18 9"}/></svg>
+          </button>
+          {showCustom && (
+            <div className="drp-custom-body">
+              <div className="drp-date-row">
+                <span className="drp-date-lbl">Від</span>
+                <input className="drp-date-input" type="date" value={fromDate} onChange={e=>setFromDate(e.target.value)}/>
+              </div>
+              <div className="drp-date-row">
+                <span className="drp-date-lbl">До</span>
+                <input className="drp-date-input" type="date" value={toDate} onChange={e=>setToDate(e.target.value)}/>
+              </div>
+              <button className="drp-apply" disabled={!fromDate||!toDate||fromDate>toDate} onClick={applyCustom}>
+                Застосувати
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ── SIDEBAR ── */
+const Sidebar = ({page, nav}) => {
+  const items=[{k:'dashboard',icon:'home',tip:'Dashboard'},{k:'competitors',icon:'users',tip:'Competitors'},{k:'intel',icon:'trend',tip:'Intelligence'},{k:'alerts',icon:'bell',tip:'Alerts'},{k:'reports',icon:'file',tip:'Reports'}];
+  const isActive=k=>page===k||(page==='competitor-profile'&&k==='competitors');
+  return (
+    <div className="sidebar">
+      <div className="s-logo" onClick={()=>nav('dashboard')}>CI</div>
+      {items.map(it=>(
+        <div key={it.k} className={`s-icon ${isActive(it.k)?'active':''}`} title={it.tip} onClick={()=>nav(it.k)}>
+          <Ico n={it.icon} s={19}/>
+          {it.k==='alerts' && <span className="s-badge"/>}
+        </div>
+      ))}
+      <div className="s-bottom">
+        <div className="s-icon" title="Settings" onClick={()=>nav('settings')} style={page==='settings'?{background:'var(--dark)',color:'#fff'}:{}}><Ico n="settings" s={19}/></div>
+        <div className="s-avatar">M</div>
+      </div>
+    </div>
+  );
+};
+
+/* ── TOP NAV ── */
+const TopNav = ({page, nav, onAdd, range, setRange}) => {
+  const navItems=[{k:'dashboard',lbl:'Dashboard'},{k:'competitors',lbl:'Competitors'},{k:'intel',lbl:'Intelligence'},{k:'reports',lbl:'Reports'}];
+  const activeKey=page==='competitor-profile'?'competitors':page;
+  return (
+    <div className="top-nav">
+      <div className="nav-left">
+        <DateRangePicker range={range} setRange={setRange}/>
+      </div>
+      <div className="nav-pill">
+        {navItems.map(it=><div key={it.k} className={`np-item ${activeKey===it.k?'active':''}`} onClick={()=>nav(it.k)}>{it.lbl}</div>)}
+      </div>
+      <div className="nav-right">
+        <button className="icon-btn" onClick={onAdd} title="Add Competitor"><Ico n="plus" s={17}/></button>
+        <button className="icon-btn" onClick={()=>nav('alerts')} title="Alerts"><Ico n="bell" s={17}/></button>
+        <div className="u-avatar">M</div>
+      </div>
+    </div>
+  );
+};
+
+/* ── MOBILE NAV ── */
+const MobNav = ({page, nav}) => {
+  const items=[{k:'dashboard',icon:'home',lbl:'Home'},{k:'competitors',icon:'users',lbl:'Rivals'},{k:'intel',icon:'trend',lbl:'Intel'},{k:'alerts',icon:'bell',lbl:'Alerts'},{k:'reports',icon:'file',lbl:'Reports'}];
+  const activeKey=page==='competitor-profile'?'competitors':page;
+  return (
+    <div className="mob-nav">
+      <div className="mob-nav-items">
+        {items.map(it=>(
+          <button key={it.k} className={`mob-nav-item ${activeKey===it.k?'active':''}`} onClick={()=>nav(it.k)}>
+            <Ico n={it.icon} s={20} c={activeKey===it.k?'#E84520':'#6b7280'}/>{it.lbl}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ── ADD COMPETITOR MODAL ── */
+const AddModal = ({onClose}) => {
+  const [url,setUrl]=useState('');
+  const [name,setName]=useState('');
+  const suggested=['Meest Express','Нова Пошта Global','Ukrposhta','Justin'];
+  return (
+    <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose()}}>
+      <div className="modal-box">
+        <div className="modal-hdr">
+          <div className="modal-title">Add Competitor</div>
+          <button className="close-btn" onClick={onClose}><Ico n="x" s={14}/></button>
+        </div>
+        <label className="input-label">Company URL</label>
+        <input className="input-field" placeholder="https://competitor.com" value={url} onChange={e=>setUrl(e.target.value)}/>
+        <label className="input-label">Company Name (optional)</label>
+        <input className="input-field" placeholder="Auto-detected from URL" value={name} onChange={e=>setName(e.target.value)}/>
+        <div style={{marginTop:8,marginBottom:4,fontSize:12.5,fontWeight:600,color:'var(--gray)'}}>Quick Add</div>
+        <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:16}}>
+          {suggested.map(s=>(
+            <button key={s} onClick={()=>setName(s)} style={{padding:'5px 12px',borderRadius:20,border:'1.5px solid #e5e7eb',background:'#f8f8f8',fontSize:12.5,cursor:'pointer',fontFamily:'DM Sans',color:'var(--dark)',transition:'all .15s'}}
+              onMouseEnter={e=>e.target.style.borderColor='#E84520'} onMouseLeave={e=>e.target.style.borderColor='#e5e7eb'}>{s}</button>
+          ))}
+        </div>
+        <div className="btn-row">
+          <button className="btn-secondary" onClick={onClose}>Cancel</button>
+          <button className="btn-primary" onClick={onClose}>Start Tracking</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ── COMPETITOR PROFILE PAGE ── */
+const CompetitorProfilePage = ({comp, onBack, range}) => {
+  const [actFilter, setActFilter] = useState('all');
+
+  const rangeFiltered = useMemo(()=> filterActivities(comp.activity, range?.days), [comp.activity, range]);
+  const filteredAct = actFilter==='all' ? rangeFiltered : rangeFiltered.filter(a=>a.cat===actFilter);
+
+  // group by category for "all" view
+  const grouped = useMemo(()=>{
+    if(actFilter!=='all') return null;
+    const groups = {};
+    rangeFiltered.forEach(a=>{
+      if(!groups[a.cat]) groups[a.cat]=[];
+      groups[a.cat].push(a);
+    });
+    return groups;
+  },[rangeFiltered, actFilter]);
+
+  const catMeta = {
+    pricing:{lbl:'Pricing Changes',icon:'💰',color:'#ef4444'},
+    product:{lbl:'Product Updates',icon:'⚡',color:'#E84520'},
+    marketing:{lbl:'Marketing Activity',icon:'📢',color:'#f97316'},
+    seo:{lbl:'SEO & Content',icon:'🔍',color:'#10b981'},
+    partnership:{lbl:'Partnerships',icon:'🤝',color:'#3b82f6'},
+  };
+
+  const threatClass = comp.threat==='High'?'t-high':comp.threat==='Medium'?'t-med':'t-low';
+
+  const p = comp.partnerships;
+
+  return (
+    <div className="page-enter">
+      <button className="back-btn" onClick={onBack}><Ico n="back" s={15}/>Back to Competitors</button>
+
+      {/* HERO */}
+      <div className="cp-hero card" style={{padding:0}}>
+        <div className="cp-hero-banner" style={{background:`linear-gradient(135deg, ${comp.color} 0%, ${comp.logoColor}33 100%)`}}>
+          <div className="cp-hero-overlay"/>
+        </div>
+        <div className="cp-hero-body">
+          <div className="cp-logo-wrap" style={{background:comp.logoColor}}>{comp.name[0]}</div>
+          <div className="cp-hero-info">
+            <div className="cp-hero-name">{comp.name}</div>
+            <div className="cp-hero-domain" style={{display:'flex',alignItems:'center',gap:8}}>
+              <span>{comp.domain}</span>
+              <span style={{color:'#d1d5db'}}>·</span>
+              <span>Updated {comp.lastUpdated}</span>
+            </div>
+            <div style={{marginTop:8,fontSize:13,color:'#555',maxWidth:480}}>{comp.desc}</div>
+          </div>
+          <div className="cp-hero-actions">
+            <span className={`threat-badge ${threatClass}`}>{comp.threat} Threat</span>
+            <button className="btn-primary" style={{padding:'9px 18px',fontSize:13,flex:'none'}}>Create Battle Card</button>
+            <button className="btn-secondary" style={{padding:'9px 14px',fontSize:13,flex:'none'}}>Add Alert</button>
+          </div>
+        </div>
+      </div>
+
+      {/* METRIC STRIP */}
+      <div className="cp-metrics">
+        {[
+          {icon:'🔍',val:`${comp.seo}%`,lbl:'SEO Score',color:'#FEF0EC',tcolor:'#E84520'},
+          {icon:'📱',val:`${comp.social}%`,lbl:'Social Score',color:'#fce4f4',tcolor:'#ec4899'},
+          {icon:'📢',val:`${comp.ads}%`,lbl:'Ad Activity',color:'#dff0ff',tcolor:'#3b82f6'},
+          {icon:'⭐',val:`${comp.reviews}/5`,lbl:'Review Score',color:'#fef9c3',tcolor:'#d97706'},
+          {icon:'💰',val:comp.pricing,lbl:'Pricing',color:'#dcfce7',tcolor:'#166534'},
+        ].map((m,i)=>(
+          <div key={i} className="cp-metric-card">
+            <div className="cp-metric-icon" style={{fontSize:22}}>{m.icon}</div>
+            <div className="cp-metric-val" style={{color:m.tcolor}}>{m.val}</div>
+            <div className="cp-metric-lbl">{m.lbl}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* BODY — 2 columns */}
+      <div className="cp-body">
+
+        {/* LEFT — Activity Feed */}
+        <div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
+            <div className="section-title" style={{marginBottom:0}}>Activity Feed</div>
+            <span className="range-pill">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              {range?.lbl || '7 днів'}
+            </span>
+          </div>
+          {filteredAct.length===0 && <div style={{padding:'24px 0',textAlign:'center',color:'var(--gray)',fontSize:13}}>Немає активності за обраний період</div>}
+          {/* Category filter */}
+          <div className="act-filter" style={{marginBottom:16}}>
+            {ACT_CATS.map(cat=>(
+              <button key={cat.k} className="act-fpill" onClick={()=>setActFilter(cat.k)}
+                style={{
+                  background: actFilter===cat.k ? cat.color : '#fff',
+                  color: actFilter===cat.k ? '#fff' : 'var(--gray)',
+                  boxShadow: actFilter===cat.k ? `0 2px 8px ${cat.color}44` : '0 1px 4px rgba(0,0,0,.08)',
+                }}>{cat.lbl}
+              </button>
+            ))}
+          </div>
+
+          <div className="card" style={{padding:'16px 20px'}}>
+            {actFilter==='all' && grouped ? (
+              Object.entries(grouped).map(([cat, items])=>(
+                <div key={cat} className="act-category-group">
+                  <div className="act-category-label">
+                    <span style={{fontSize:14}}>{catMeta[cat]?.icon}</span>
+                    <span style={{color:catMeta[cat]?.color}}>{catMeta[cat]?.lbl||cat}</span>
+                    <div className="act-category-line"/>
+                    <span style={{background:catMeta[cat]?.color+'18',color:catMeta[cat]?.color,padding:'1px 7px',borderRadius:20,fontSize:10.5,fontWeight:600,flexShrink:0}}>{items.length}</span>
+                  </div>
+                  {items.map((a,i)=>(
+                    <div key={i} className="act-item">
+                      <div className="act-dot" style={{background:a.color}}/>
+                      <div>
+                        <div className="act-text">{a.text}</div>
+                        <div className="act-time">{a.time}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))
+            ) : (
+              filteredAct.length===0
+                ? <div style={{textAlign:'center',padding:'24px 0',color:'var(--gray)',fontSize:13}}>No activity in this category yet.</div>
+                : filteredAct.map((a,i)=>(
+                  <div key={i} className="act-item">
+                    <div className="act-dot" style={{background:a.color}}/>
+                    <div>
+                      <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:2}}>
+                        <span style={{fontSize:12,background:a.color+'18',color:a.color,padding:'1px 7px',borderRadius:20,fontWeight:600}}>{catMeta[a.cat]?.lbl||a.cat}</span>
+                      </div>
+                      <div className="act-text">{a.text}</div>
+                      <div className="act-time">{a.time}</div>
+                    </div>
+                  </div>
+                ))
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT — Partnerships & Distribution */}
+        <div>
+          <div className="section-title">Partnerships & Distribution</div>
+
+          {/* Strategic Partnerships */}
+          <div className="card" style={{marginBottom:16}}>
+            <div style={{fontFamily:'Syne',fontSize:14,fontWeight:700,color:'var(--dark)',marginBottom:12,display:'flex',alignItems:'center',gap:8}}>
+              <span>🤝</span> Strategic Partnerships
+            </div>
+            {p.strategic.map((pt,i)=>(
+              <div key={i} className="partner-item">
+                <div className="partner-logo" style={{background:pt.bg}}>{pt.logo}</div>
+                <div className="partner-info">
+                  <div className="partner-name">{pt.name}</div>
+                  <div className="partner-type">{pt.type}</div>
+                </div>
+                <span className="partner-since">Since {pt.since}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Distribution Channels */}
+          <div className="card" style={{marginBottom:16}}>
+            <div style={{fontFamily:'Syne',fontSize:14,fontWeight:700,color:'var(--dark)',marginBottom:14,display:'flex',alignItems:'center',gap:8}}>
+              <span>📡</span> Distribution Channels
+            </div>
+            {[
+              {lbl:'🌐 Online', tags:p.channels.online, tagBg:'#FEF0EC', tagColor:'#E84520'},
+              {lbl:'🏢 Offline', tags:p.channels.offline, tagBg:'#fef3c7', tagColor:'#92400e'},
+              {lbl:'🛒 Marketplace', tags:p.channels.marketplace, tagBg:'#dff0ff', tagColor:'#1e40af'},
+            ].map(ch=>(
+              <div key={ch.lbl} className="channel-section">
+                <div className="channel-label">{ch.lbl}</div>
+                <div className="channel-tags">
+                  {ch.tags.map((t,i)=>(
+                    <span key={i} className="channel-tag" style={{background:ch.tagBg,color:ch.tagColor}}>{t}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* B2B vs B2C */}
+          <div className="card">
+            <div style={{fontFamily:'Syne',fontSize:14,fontWeight:700,color:'var(--dark)',marginBottom:12,display:'flex',alignItems:'center',gap:8}}>
+              <span>⚖️</span> B2B vs B2C Balance
+            </div>
+            <div className="b2b-bar">
+              <div className="b2b-track">
+                <div className="b2b-fill" style={{width:`${p.b2b}%`}}/>
+              </div>
+              <div className="b2b-labels">
+                <span style={{color:'#E84520',fontWeight:600}}>B2B {p.b2b}%</span>
+                <span style={{color:'#ec4899',fontWeight:600}}>B2C {p.b2c}%</span>
+              </div>
+            </div>
+            <div style={{marginTop:12,padding:'10px 12px',background:'#f8f8f8',borderRadius:10,fontSize:12.5,color:'#555',lineHeight:1.5}}>
+              {p.notes}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── MARKETING STRATEGY ── */}
+      <div className="cp-section">
+        <div className="cp-section-hdr">
+          <div className="cp-section-icon" style={{background:'#FEF0EC'}}>📣</div>
+          <div className="cp-section-title">Marketing Strategy</div>
+          <div className="cp-section-line"/>
+        </div>
+        <div className="analysis-grid">
+
+          {/* Channel Mix */}
+          <div className="a-card">
+            <div className="a-card-title">📊 Channel Mix</div>
+            {comp.marketing.channels.map((ch,i)=>(
+              <div key={i} className="ch-bar-row">
+                <span className="ch-bar-lbl">{ch.name}</span>
+                <div className="ch-bar-track"><div className="ch-bar-fill" style={{width:`${ch.score}%`,background:ch.color}}/></div>
+                <span className="ch-bar-val">{ch.score}%</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Content Marketing */}
+          <div className="a-card">
+            <div className="a-card-title">✍️ Content Marketing</div>
+            <div className="metric-pair"><span className="mp-lbl">Frequency</span><span className="mp-val">{comp.marketing.content.frequency}</span></div>
+            <div className="metric-pair"><span className="mp-lbl">Engagement</span><span className="mp-val" style={{color:'var(--green)',fontSize:12}}>{comp.marketing.content.engagement}</span></div>
+            <div className="metric-pair" style={{alignItems:'flex-start',border:'none'}}>
+              <span className="mp-lbl">Top piece</span>
+              <span style={{fontSize:12,fontWeight:500,color:'var(--purple)',textAlign:'right',maxWidth:160,lineHeight:1.4}}>{comp.marketing.content.topPiece}</span>
+            </div>
+            <div style={{marginTop:8,fontSize:12,color:'var(--gray)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}}>Content Types</div>
+            <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
+              {comp.marketing.content.types.map((t,i)=>(
+                <span key={i} style={{padding:'3px 9px',borderRadius:20,fontSize:12,background:'#FEF0EC',color:'#E84520'}}>{t}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Messaging & TOV */}
+          <div className="a-card">
+            <div className="a-card-title">💬 Messaging & TOV</div>
+            <div style={{fontSize:12,color:'var(--gray)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}}>Key Messages</div>
+            {comp.marketing.messaging.keyMessages.map((m,i)=>(
+              <div key={i} style={{display:'flex',gap:7,marginBottom:6}}>
+                <div style={{width:5,height:5,borderRadius:'50%',background:'#E84520',marginTop:6,flexShrink:0}}/>
+                <span style={{fontSize:13,color:'var(--dark)',lineHeight:1.4}}>{m}</span>
+              </div>
+            ))}
+            <div style={{marginTop:10,padding:'9px 11px',background:'#f8f8f8',borderRadius:9,fontSize:12.5,color:'#555',lineHeight:1.5}}>
+              <span style={{fontWeight:600,color:'var(--dark)'}}>TOV: </span>{comp.marketing.messaging.tov}
+            </div>
+            <div style={{marginTop:8,padding:'9px 11px',background:'#FEF0EC55',borderRadius:9,border:'1px solid #FEF0EC',fontSize:12.5,color:'#555',lineHeight:1.5}}>
+              <span style={{fontWeight:600,color:'#E84520'}}>Story: </span>{comp.marketing.messaging.story}
+            </div>
+          </div>
+
+          {/* Media Presence */}
+          <div className="a-card">
+            <div className="a-card-title">📰 Media Presence</div>
+            <div style={{fontSize:12,color:'var(--gray)',marginBottom:4}}>Share of Voice</div>
+            <div style={{fontFamily:'Inter',fontSize:28,fontWeight:700,color:'var(--dark)'}}>{comp.marketing.media.shareOfVoice}%</div>
+            <div className="sov-bar"><div className="sov-fill" style={{width:`${comp.marketing.media.shareOfVoice}%`}}/></div>
+            <div style={{fontSize:12,color:'var(--gray)',marginBottom:4}}>PR Activity</div>
+            <div style={{fontSize:13,color:'var(--dark)',lineHeight:1.4,marginBottom:10}}>{comp.marketing.media.prActivity}</div>
+            <div style={{fontSize:12,color:'var(--gray)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}}>Media Mentions</div>
+            <div className="mention-list">
+              {comp.marketing.media.mentions.map((m,i)=><span key={i} className="mention-tag">{m}</span>)}
+            </div>
+          </div>
+
+          {/* Influencer Partnerships */}
+          <div className="a-card" style={{gridColumn:'span 2'}}>
+            <div className="a-card-title">🌟 Influencer Partnerships</div>
+            {comp.marketing.influencers.map((inf,i)=>{
+              const colors=['#E84520','#ec4899','#3b82f6','#10b981','#f97316'];
+              return (
+                <div key={i} className="inf-item">
+                  <div className="inf-av" style={{background:colors[i%colors.length]}}>{inf.name[0]}</div>
+                  <div className="inf-info">
+                    <div className="inf-name">{inf.name}</div>
+                    <div className="inf-role">{inf.role} · {inf.platform}</div>
+                  </div>
+                  <span className="inf-reach">{inf.reach}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── DIGITAL PRESENCE ── */}
+      <div className="cp-section" style={{marginBottom:32}}>
+        <div className="cp-section-hdr">
+          <div className="cp-section-icon" style={{background:'#dff0ff'}}>💻</div>
+          <div className="cp-section-title">Digital Presence</div>
+          <div className="cp-section-line"/>
+        </div>
+        <div className="analysis-grid">
+
+          {/* Web Analytics */}
+          <div className="a-card">
+            <div className="a-card-title">🌐 Web Analytics</div>
+            <div style={{fontFamily:'Inter',fontSize:26,fontWeight:700,color:'var(--dark)',marginBottom:2}}>{comp.digital.web.monthlyTraffic}</div>
+            <div style={{fontSize:12,color:'var(--gray)',marginBottom:12}}>Monthly visitors</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:14}}>
+              {[{lbl:'Bounce Rate',val:comp.digital.web.bounceRate},{lbl:'Avg Session',val:comp.digital.web.avgSession}].map(m=>(
+                <div key={m.lbl} style={{background:'#f8f8f8',borderRadius:9,padding:'8px 10px'}}>
+                  <div style={{fontSize:11,color:'var(--gray)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.5px'}}>{m.lbl}</div>
+                  <div style={{fontSize:15,fontWeight:700,color:'var(--dark)',marginTop:2}}>{m.val}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{fontSize:12,color:'var(--gray)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}}>Traffic Sources</div>
+            {Object.entries(comp.digital.web.sources).map(([k,v])=>{
+              const cols={organic:'#10b981',paid:'#3b82f6',social:'#ec4899',direct:'#f97316'};
+              const lbls={organic:'Organic',paid:'Paid',social:'Social',direct:'Direct'};
+              return(
+                <div key={k} className="src-row">
+                  <span className="src-lbl">{lbls[k]}</span>
+                  <div className="src-track"><div className="src-fill" style={{width:`${v}%`,background:cols[k]}}/></div>
+                  <span className="src-val" style={{color:cols[k]}}>{v}%</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* SEO Metrics */}
+          <div className="a-card">
+            <div className="a-card-title">🔍 SEO Metrics</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:12}}>
+              {[{lbl:'Domain Authority',val:comp.digital.seo.domainAuthority},{lbl:'Organic Visibility',val:`${comp.digital.seo.organicVisibility}%`},{lbl:'Backlinks',val:comp.digital.seo.backlinks},{lbl:'Ranking Pages',val:comp.digital.seo.rankingPages.toLocaleString()}].map(m=>(
+                <div key={m.lbl} style={{background:'#f8f8f8',borderRadius:9,padding:'8px 10px'}}>
+                  <div style={{fontSize:11,color:'var(--gray)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.4px'}}>{m.lbl}</div>
+                  <div style={{fontSize:16,fontWeight:700,color:'var(--dark)',marginTop:2}}>{m.val}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{fontSize:12,color:'var(--gray)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}}>Top Keywords</div>
+            <div className="kw-tags">
+              {comp.digital.seo.topKeywords.map((k,i)=><span key={i} className="kw-tag">{k}</span>)}
+            </div>
+          </div>
+
+          {/* Paid Advertising */}
+          <div className="a-card">
+            <div className="a-card-title">📢 Paid Advertising</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:12}}>
+              {[{lbl:'Est. Budget',val:comp.digital.paid.budget},{lbl:'Creatives',val:comp.digital.paid.creatives}].map(m=>(
+                <div key={m.lbl} style={{background:'#f8f8f8',borderRadius:9,padding:'8px 10px'}}>
+                  <div style={{fontSize:11,color:'var(--gray)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.4px'}}>{m.lbl}</div>
+                  <div style={{fontSize:16,fontWeight:700,color:'var(--dark)',marginTop:2}}>{m.val}</div>
+                </div>
+              ))}
+            </div>
+            <div className="metric-pair"><span className="mp-lbl">Platforms</span><span className="mp-val">{comp.digital.paid.platforms.join(', ')}</span></div>
+            <div style={{padding:'9px 11px',background:'#fff8f0',borderRadius:9,border:'1px solid #fde8c8',marginTop:10}}>
+              <div style={{fontSize:11,color:'#d97706',fontWeight:600,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:4}}>Top Ad</div>
+              <div style={{fontSize:13,color:'var(--dark)',lineHeight:1.4}}>{comp.digital.paid.topAd}</div>
+            </div>
+            <div style={{marginTop:10,padding:'9px 11px',background:'#f8f8f8',borderRadius:9}}>
+              <div style={{fontSize:11,color:'var(--gray)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:4}}>Targeting</div>
+              <div style={{fontSize:12.5,color:'#555',lineHeight:1.4}}>{comp.digital.paid.targeting}</div>
+            </div>
+          </div>
+
+          {/* Social Media */}
+          <div className="a-card">
+            <div className="a-card-title">📱 Social Media</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:4,marginBottom:8,fontSize:11,fontWeight:600,color:'var(--gray)',textTransform:'uppercase',letterSpacing:'.4px',paddingBottom:6,borderBottom:'1px solid #f0f0f0'}}>
+              <span>Platform</span><span>Followers</span><span>Growth</span><span>Eng.</span>
+            </div>
+            {comp.digital.social.map((s,i)=>(
+              <div key={i} style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:4,padding:'7px 0',borderBottom:i<comp.digital.social.length-1?'1px solid #f8f8f8':'none',alignItems:'center'}}>
+                <span style={{fontSize:13,fontWeight:600,color:'var(--dark)'}}>{s.name}</span>
+                <span style={{fontSize:12,color:'var(--dark)'}}>{s.followers}</span>
+                <span style={{fontSize:12,fontWeight:600,color:s.growth.startsWith('+')?'var(--green)':'var(--red)'}}>{s.growth}</span>
+                <span style={{fontSize:12,color:'var(--gray)'}}>{s.engagement}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Email Marketing */}
+          <div className="a-card" style={{gridColumn:'span 2'}}>
+            <div className="a-card-title">📧 Email Marketing</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+              <div>
+                <div className="metric-pair"><span className="mp-lbl">Frequency</span><span className="mp-val">{comp.digital.email.frequency}</span></div>
+                <div className="metric-pair"><span className="mp-lbl">Est. List Size</span><span className="mp-val" style={{color:'var(--purple)'}}>{comp.digital.email.listSize}</span></div>
+              </div>
+              <div>
+                <div style={{fontSize:12,color:'var(--gray)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}}>Campaign Types</div>
+                <div className="email-tags">
+                  {comp.digital.email.campaigns.map((c,i)=><span key={i} className="email-tag">{c}</span>)}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ── DASHBOARD PAGE ── */
+const Dashboard = ({onComp, onAdd, range}) => {
+  const [search,setSearch]=useState('');
+  const data = CHART_DATA[range?.k] || CHART_DATA['7d'];
+  const rangeLbl = range?.lbl || '7 днів';
+  const filtered=COMPETITORS.filter(c=>c.name.toLowerCase().includes(search.toLowerCase()));
+  return (
+    <div className="page-enter">
+      <h1 className="page-title">Dashboard</h1>
+      <div className="dash-grid">
+        <div className="col-left">
+          <div className="card">
+            <div className="card-hdr"><div className="card-title">Track Competitors</div><button className="exp-btn" onClick={onAdd}><Ico n="plus" s={13}/></button></div>
+            <div className="card-sub">Monitor your key rivals in real-time</div>
+            <div className="search-bar">
+              <Ico n="search" s={15} c="#9ca3af"/>
+              <input placeholder="Search competitors..." value={search} onChange={e=>setSearch(e.target.value)}/>
+              <button className="search-btn"><Ico n="search" s={13} c="#fff"/></button>
+            </div>
+            <div style={{maxHeight:320,overflowY:'auto',display:'flex',flexDirection:'column',gap:8}}>
+              {filtered.map((c,i)=>(
+                <div key={c.id} className="comp-item" style={{background:c.color,animationDelay:`${i*0.06}s`}} onClick={()=>onComp(c)}>
+                  <div className="comp-item-hdr">
+                    <div className="comp-name">{c.name}</div>
+                    <span className={`threat-badge t-${c.threat==='High'?'high':c.threat==='Medium'?'med':'low'}`}>{c.threat}</span>
+                  </div>
+                  <div className="comp-desc">{c.desc}</div>
+                  <div className="comp-footer">
+                    <div className="comp-date"><Ico n="cal" s={12}/>{c.date}</div>
+                    <div className="av-group">{c.avs.map((a,j)=><div key={j} className="av-mini">{a}</div>)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button className="add-btn" onClick={onAdd}><Ico n="plus" s={14}/>Add new competitor</button>
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-hdr">
+            <div>
+              <div className="card-title">Performance Chart</div>
+              <div className="card-sub">Дані за: <strong style={{color:'var(--purple)'}}>{rangeLbl}</strong></div>
+            </div>
+            <button className="exp-btn"><Ico n="ext" s={12}/></button>
+          </div>
+          <div className="chart-legend">
+            {[{col:'#E84520',lbl:'SEO'},{col:'#ec4899',lbl:'Social'},{col:'#3b82f6',lbl:'Ads'}].map(l=>(
+              <div key={l.lbl} className="leg-item"><div className="leg-dot" style={{background:l.col}}/>{l.lbl}</div>
+            ))}
+          </div>
+          <LineChart data={data}/>
+          <div style={{marginTop:12,padding:'12px 14px',background:'#111827',borderRadius:12,display:'flex',alignItems:'center',gap:10}}>
+            <div style={{width:28,height:28,borderRadius:8,background:'rgba(255,255,255,.15)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:14}}>↑</div>
+            <div>
+              <div style={{fontSize:13,fontWeight:600,color:'#fff'}}>+12 SEO позицій за тиждень</div>
+              <div style={{fontSize:11.5,color:'rgba(255,255,255,.5)'}}>Wingo піднявся по ключових словах доставка з Китаю</div>
+            </div>
+          </div>
+        </div>
+        <div className="bot-row">
+          <div className="card">
+            <div className="card-hdr">
+              <div><div className="card-title">Recent Changes</div><div className="card-sub">Detected in last 48h</div></div>
+              <div style={{background:'#f5f5f5',borderRadius:8,padding:'3px 8px',fontSize:11.5,fontWeight:600,color:'var(--dark)'}}>Today ▾</div>
+            </div>
+            {CHANGES.map(c=>(
+              <div key={c.id} className="ch-item">
+                <div className="ch-icon" style={{background:c.color}}>{c.icon}</div>
+                <div className="ch-info">
+                  <div className="ch-name">{c.comp} — {c.type}</div>
+                  <div className="ch-time">{c.desc}</div>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <div className="ch-pct">{c.conf}%</div>
+                  <div className="conf-bar"><div className="conf-fill" style={{width:`${c.conf}%`}}/></div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="card">
+            <div className="card-hdr">
+              <div><div className="card-title">Threat Score</div><div className="card-sub">See how rivals rank</div></div>
+              <div style={{background:'#f5f5f5',borderRadius:8,padding:'3px 8px',fontSize:11.5,fontWeight:600,color:'var(--dark)'}}>All ▾</div>
+            </div>
+            {COMPETITORS.map(c=>(
+              <div key={c.id} className="sc-item" onClick={()=>onComp(c)}>
+                <div className="sc-av" style={{background:c.logoColor}}>{c.name[0]}</div>
+                <div className="sc-info">
+                  <div className="sc-name">{c.name}</div>
+                  <div className="sc-meta"><Ico n="eye" s={10} c="#9ca3af"/> {c.seo} SEO &nbsp;<Ico n="chart" s={10} c="#9ca3af"/> {c.ads} Ads &nbsp;{c.lastUpdated}</div>
+                </div>
+                <div className="sc-score">{c.score.toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ── COMPETITORS PAGE ── */
+const CompetitorsPage = ({onComp, range}) => {
+  const [filter,setFilter]=useState('all');
+  const filters=[{k:'all',lbl:'All'},{k:'High',lbl:'High Threat'},{k:'Medium',lbl:'Medium'},{k:'Low',lbl:'Low Threat'}];
+  const shown=filter==='all'?COMPETITORS:COMPETITORS.filter(c=>c.threat===filter);
+  return (
+    <div className="page-enter">
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
+        <h1 className="page-title" style={{marginBottom:0}}>Competitors</h1>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <span className="range-pill"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{range?.lbl||'7 днів'}</span>
+          <div style={{fontSize:13,color:'var(--gray)'}}>Tracking <strong style={{color:'var(--dark)'}}>{COMPETITORS.length}</strong> companies</div>
+        </div>
+      </div>
+      <div className="filter-pills">
+        {filters.map(f=><button key={f.k} className={`fpill ${filter===f.k?'active':''}`} onClick={()=>setFilter(f.k)}>{f.lbl}</button>)}
+      </div>
+      <div className="stat-row">
+        {[{num:4,lbl:'Tracked',chg:'+1 this week',up:true},{num:2,lbl:'High Threat',chg:'unchanged',up:null},{num:'94%',lbl:'Data Fresh',chg:'+2% vs last week',up:true},{num:12,lbl:'New Alerts',chg:'+4 today',up:false}].map((s,i)=>(
+          <div key={i} className="stat-card">
+            <div className="stat-num">{s.num}</div>
+            <div className="stat-lbl">{s.lbl}</div>
+            {s.up!==null ? <div className={`stat-chg ${s.up?'up':'down'}`}>{s.up?'↑':'↓'} {s.chg}</div> : <div className="stat-chg" style={{color:'var(--gray)'}}>— {s.chg}</div>}
+          </div>
+        ))}
+      </div>
+      <div className="comp-grid">
+        {shown.map(c=>(
+          <div key={c.id} className="comp-card" onClick={()=>onComp(c)}>
+            <div className="cc-hdr" style={{background:c.color}}>
+              <div className="cc-logo" style={{background:c.logoColor}}>{c.name[0]}</div>
+              <span className={`threat-badge t-${c.threat==='High'?'high':c.threat==='Medium'?'med':'low'}`}>{c.threat} Threat</span>
+            </div>
+            <div className="cc-info">
+              <div className="cc-name">{c.name}</div>
+              <div className="cc-domain">{c.domain} · Updated {c.lastUpdated}</div>
+              <div style={{fontSize:12,color:'#555',marginBottom:12,lineHeight:1.4}}>{c.desc}</div>
+              {[{lbl:'SEO',val:c.seo,col:'#E84520'},{lbl:'Social',val:c.social,col:'#ec4899'},{lbl:'Ads',val:c.ads,col:'#3b82f6'}].map(m=>(
+                <div key={m.lbl} className="mb-item">
+                  <span className="mb-lbl">{m.lbl}</span>
+                  <div className="mb-track"><div className="mb-fill" style={{width:`${m.val}%`,background:m.col}}/></div>
+                  <span className="mb-val">{m.val}%</span>
+                </div>
+              ))}
+              <div style={{marginTop:12,paddingTop:12,borderTop:'1px solid #f5f5f5',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div style={{fontSize:12,color:'var(--gray)'}}>Score: <strong style={{color:'var(--dark)',fontFamily:'Syne',fontSize:14}}>{c.score.toLocaleString()}</strong></div>
+                <div style={{fontSize:12,color:c.change>0?'var(--green)':'var(--red)',fontWeight:600}}>{c.change>0?'+':''}{c.change} this week</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ── INTEL PAGE ── */
+const IntelPage = ({range}) => {
+  const [tab,setTab]=useState('seo');
+  const tabs=[{k:'seo',lbl:'SEO'},{k:'ads',lbl:'Ads'},{k:'social',lbl:'Social'},{k:'reviews',lbl:'Reviews'}];
+  const kpis={
+    seo:[{lbl:'Avg Keyword Rank',val:'#5.8',chg:'+1.2',up:true},{lbl:'Total Keywords',val:'6.9K',chg:'+240',up:true},{lbl:'Organic Traffic',val:'417K',chg:'+12%',up:true},{lbl:'Backlinks',val:'122K',chg:'+3.4K',up:true}],
+    ads:[{lbl:'Total Ad Spend',val:'$171K',chg:'+8%',up:false},{lbl:'Avg CTR',val:'3.1%',chg:'+0.3%',up:true},{lbl:'Active Creatives',val:'70',chg:'+9',up:true},{lbl:'Platforms',val:'4',chg:'—',up:null}],
+    social:[{lbl:'Total Followers',val:'217K',chg:'+4.8%',up:true},{lbl:'Avg Engagement',val:'4.0%',chg:'+0.6%',up:true},{lbl:'Posts This Week',val:'141',chg:'+18',up:true},{lbl:'Top Platform',val:'LinkedIn',chg:'—',up:null}],
+    reviews:[{lbl:'Avg Rating',val:'4.3/5',chg:'+0.1',up:true},{lbl:'Total Reviews',val:'2.8K',chg:'+124',up:true},{lbl:'Sentiment',val:'78%',chg:'+3%',up:true},{lbl:'Top Platform',val:'G2',chg:'—',up:null}],
+  };
+  const headers={seo:['Competitor','Rank','Keywords','Traffic','Backlinks','Trend'],ads:['Competitor','Platform','Est. Spend','Creatives','CTR','Trend'],social:['Competitor','Followers','Growth','Engagement','Posts/Week'],reviews:['Competitor','Rating','G2','Capterra','Trustpilot','Trend']};
+  const rows={
+    seo:SEO_DATA.map(r=>[r.comp,`#${r.rank}`,r.keywords,r.traffic,r.backlinks,r.trend]),
+    ads:ADS_DATA.map(r=>[r.comp,r.platform,r.spend,r.creatives,r.ctr,r.trend]),
+    social:SOCIAL_DATA.map(r=>[r.comp,r.followers,r.growth,r.engagement,r.posts]),
+    reviews:COMPETITORS.map(c=>[c.name,`${c.reviews}/5`,'4.3','4.1','3.8',c.change>0?'+2%':'-1%']),
+  };
+  return (
+    <div className="page-enter">
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
+        <h1 className="page-title" style={{marginBottom:0}}>Intelligence</h1>
+        <span className="range-pill"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{range?.lbl||'7 днів'}</span>
+      </div>
+      <div className="intel-tabs">{tabs.map(t=><button key={t.k} className={`i-tab ${tab===t.k?'active':''}`} onClick={()=>setTab(t.k)}>{t.lbl}</button>)}</div>
+      <div className="kpi-grid">
+        {kpis[tab].map((k,i)=>(
+          <div key={i} className="kpi-card">
+            <div className="kpi-lbl">{k.lbl}</div>
+            <div className="kpi-val">{k.val}</div>
+            {k.up!==null ? <div className={`kpi-chg ${k.up?'up':'down'}`}>{k.up?'↑':'↓'} {k.chg}</div> : <div className="kpi-chg" style={{color:'var(--gray)'}}>— {k.chg}</div>}
+          </div>
+        ))}
+      </div>
+      <div style={{overflowX:'auto'}}>
+        <table className="data-table">
+          <thead><tr>{headers[tab].map(h=><th key={h}>{h}</th>)}</tr></thead>
+          <tbody>
+            {rows[tab].map((row,i)=>(
+              <tr key={i}>{row.map((cell,j)=>(
+                <td key={j} style={j===0?{fontWeight:600}:{}}>
+                  {j===row.length-1 && String(cell).includes('%') ? <span className={String(cell).startsWith('+')?'trend-up':'trend-down'}>{cell}</span> : cell}
+                </td>
+              ))}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+/* ── ALERTS PAGE ── */
+const AlertsPage = ({range}) => {
+  const [filter,setFilter]=useState('all');
+  const [expanded,setExpanded]=useState(null);
+  const fs=[{k:'all',lbl:'All'},{k:'critical',lbl:'Critical'},{k:'high',lbl:'High'},{k:'medium',lbl:'Medium'},{k:'low',lbl:'Low'}];
+  const rangeFiltered = filterActivities(ALERTS.map(a=>({...a,time:a.time})), range?.days);
+  const shown=filter==='all'?rangeFiltered:rangeFiltered.filter(a=>a.sev===filter);
+  const sevIcon={critical:'🔴',high:'🟠',medium:'🟡',low:'🟢'};
+  return (
+    <div className="page-enter">
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
+        <h1 className="page-title" style={{marginBottom:0}}>Alerts</h1>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <span className="range-pill"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{range?.lbl||'7 днів'}</span>
+          <div style={{background:'var(--red)',color:'#fff',borderRadius:20,padding:'4px 12px',fontSize:12.5,fontWeight:600}}>{ALERTS.filter(a=>!a.read).length} new</div>
+        </div>
+      </div>
+      <div className="filter-pills">{fs.map(f=><button key={f.k} className={`fpill ${filter===f.k?'active':''}`} onClick={()=>setFilter(f.k)}>{f.lbl}</button>)}</div>
+      <div className="alerts-list">
+        {shown.map(a=>(
+          <div key={a.id} className={`al-card al-${a.sev}`} onClick={()=>setExpanded(expanded===a.id?null:a.id)}>
+            <div className={`al-sev sev-${a.sev}`}>{sevIcon[a.sev]}</div>
+            <div className="al-content">
+              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                <div className="al-title">{a.title}</div>
+                {!a.read && <div style={{width:7,height:7,borderRadius:'50%',background:'var(--purple)',flexShrink:0}}/>}
+              </div>
+              <div className="al-desc">{a.desc}</div>
+              <div className="al-meta">
+                <span style={{background:'#f3f4f6',padding:'2px 7px',borderRadius:6,fontWeight:500}}>{a.comp}</span>
+                <span>{a.time}</span>
+                <span style={{color:expanded===a.id?'var(--purple)':'var(--gray)'}}>{expanded===a.id?'▲ Less':'▼ More'}</span>
+              </div>
+              {expanded===a.id && (
+                <div style={{marginTop:12,padding:12,background:'#f8f8f8',borderRadius:10,fontSize:12.5,color:'var(--gray)',lineHeight:1.5}}>
+                  <strong style={{color:'var(--dark)'}}>Recommended Action:</strong> Review your positioning and consider a competitive response. Update your battle cards with the latest data.
+                  <div style={{display:'flex',gap:8,marginTop:10}}>
+                    <button className="btn-primary" style={{flex:1,padding:'8px 12px',fontSize:12.5}}>Create Battle Card</button>
+                    <button className="btn-secondary" style={{flex:1,padding:'8px 12px',fontSize:12.5}}>Dismiss</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ── REPORTS PAGE ── */
+const ReportsPage = ({range}) => {
+  const [previewId,setPreviewId]=useState(null);
+  return (
+    <div className="page-enter">
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
+        <h1 className="page-title" style={{marginBottom:0}}>Reports</h1>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <span className="range-pill"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{range?.lbl||'7 днів'}</span>
+          <button className="btn-primary" style={{padding:'9px 18px',fontSize:13}}>+ New Report</button>
+        </div>
+      </div>
+      <div className="rep-grid">
+        {REPORTS.map(r=>(
+          <div key={r.id} className="rep-card" onClick={()=>setPreviewId(r.id)}>
+            <div className="rep-icon" style={{background:r.status==='gen'?'#fef9c3':'#FEF0EC'}}>{r.icon}</div>
+            <div><div className="rep-title">{r.title}</div><div className="rep-meta">{r.type} · {r.date}</div></div>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <span className={`rep-status ${r.status==='ready'?'status-ready':'status-gen'}`}>{r.status==='ready'?'Ready':'Generating...'}</span>
+              {r.pages!=='—' && <span style={{fontSize:12,color:'var(--gray)'}}>{r.pages} pages</span>}
+            </div>
+            <div className="rep-footer">
+              <button className="rep-dl" onClick={e=>e.stopPropagation()}><Ico n="eye" s={13}/>Preview</button>
+              {r.status==='ready' && <button className="rep-dl" onClick={e=>e.stopPropagation()}><Ico n="dl" s={13}/>Download</button>}
+            </div>
+          </div>
+        ))}
+      </div>
+      {previewId && (
+        <div className="modal-overlay" onClick={()=>setPreviewId(null)}>
+          <div className="modal-box" style={{maxWidth:600}}>
+            <div className="modal-hdr">
+              <div className="modal-title">{REPORTS.find(r=>r.id===previewId)?.title}</div>
+              <button className="close-btn" onClick={()=>setPreviewId(null)}><Ico n="x" s={14}/></button>
+            </div>
+            <div style={{background:'#f8f8f8',borderRadius:14,padding:20,marginBottom:16}}>
+              {['Executive Summary','Key Findings','Competitor Profiles','SEO Analysis','Ad Intelligence','Recommendations'].map((s,i)=>(
+                <div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 0',borderBottom:i<5?'1px solid #eee':'none'}}>
+                  <div style={{fontSize:13,color:'var(--dark)',fontWeight:i===0?600:400}}>{s}</div>
+                  <div style={{fontSize:12,color:'var(--gray)'}}>p. {i*3+1}</div>
+                </div>
+              ))}
+            </div>
+            <div className="btn-row">
+              <button className="btn-secondary" onClick={()=>setPreviewId(null)}>Close</button>
+              <button className="btn-primary"><Ico n="dl" s={14}/> &nbsp;Download PDF</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ── SETTINGS PAGE ── */
+const SettingsPage = () => {
+  const [toggles,setToggles]=useState({email:true,slack:false,teams:false,weekly:true,pricing:true,features:true,seo:false});
+  const tog=k=>setToggles(t=>({...t,[k]:!t[k]}));
+  const integrations=[{icon:'💬',name:'Slack',desc:'Get alerts in your Slack workspace',k:'slack'},{icon:'🔵',name:'Microsoft Teams',desc:'Notifications directly in Teams',k:'teams'},{icon:'📧',name:'Email',desc:'Weekly digest + instant alerts',k:'email'},{icon:'🔗',name:'HubSpot',desc:'Sync competitor data to CRM',k:null,connected:false},{icon:'☁️',name:'Salesforce',desc:'Competitive intel in your CRM',k:null,connected:false}];
+  return (
+    <div className="page-enter">
+      <h1 className="page-title">Settings</h1>
+      <div style={{maxWidth:600}}>
+        <div className="set-section">
+          <div className="set-title">Notifications</div>
+          <div className="card">
+            {[{lbl:'Email Digest',desc:'Receive daily summary via email',k:'email'},{lbl:'Pricing Alerts',desc:'Notify when competitor pricing changes',k:'pricing'},{lbl:'Feature Alerts',desc:'Alert on new competitor features',k:'features'},{lbl:'SEO Monitoring',desc:'Weekly SEO ranking changes',k:'seo'},{lbl:'Weekly Report',desc:'Auto-generate and send weekly digest',k:'weekly'}].map(s=>(
+              <div key={s.k} className="set-row">
+                <div><div className="set-row-label">{s.lbl}</div><div className="set-row-desc">{s.desc}</div></div>
+                <button className={`toggle ${toggles[s.k]?'on':''}`} onClick={()=>tog(s.k)}/>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="set-section">
+          <div className="set-title">Integrations</div>
+          {integrations.map((intg,i)=>(
+            <div key={i} className="intg-card">
+              <div className="intg-logo" style={{background:'#f5f5f5'}}>{intg.icon}</div>
+              <div className="intg-info">
+                <div className="intg-name">{intg.name}</div>
+                <div className="intg-status">{intg.k?toggles[intg.k]?'Connected':'Disconnected':intg.connected?'Connected':'Not connected'}</div>
+              </div>
+              {intg.k ? (
+                <button className={`btn-connect ${toggles[intg.k]?'btn-connected':'btn-disconnected'}`} onClick={()=>tog(intg.k)}>{toggles[intg.k]?'Connected':'Connect'}</button>
+              ) : (
+                <button className="btn-connect btn-disconnected">Connect</button>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="set-section">
+          <div className="set-title">Plan & Billing</div>
+          <div className="card" style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:16}}>
+            <div>
+              <div style={{fontFamily:'Syne',fontSize:18,fontWeight:700,marginBottom:4}}>Professional</div>
+              <div style={{fontSize:13,color:'var(--gray)'}}>$499/month · Up to 10 competitors · 5 users</div>
+              <div style={{marginTop:8,fontSize:12,color:'var(--green)',fontWeight:600}}>✓ All features included</div>
+            </div>
+            <button className="btn-primary" style={{padding:'10px 18px',fontSize:13,flexShrink:0}}>Upgrade to Enterprise</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ── APP ── */
+const App = () => {
+  const [page, setPage] = useState('dashboard');
+  const [compProfile, setCompProfile] = useState(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [range, setRange] = useState(TIME_RANGES[1]); // default: 7 днів
+
+  const nav = useCallback(p => {
+    setPage(p);
+    setCompProfile(null);
+  }, []);
+
+  const openComp = useCallback(comp => {
+    setCompProfile(comp);
+    setPage('competitor-profile');
+  }, []);
+
+  const backFromProfile = useCallback(() => {
+    setCompProfile(null);
+    setPage('competitors');
+  }, []);
+
+  return (
+    <div className="app">
+      <Sidebar page={page} nav={nav}/>
+      <div className="main">
+        <TopNav page={page} nav={nav} onAdd={()=>setShowAdd(true)} range={range} setRange={setRange}/>
+        {page==='dashboard' && <Dashboard onComp={openComp} onAdd={()=>setShowAdd(true)} range={range}/>}
+        {page==='competitors' && <CompetitorsPage onComp={openComp} range={range}/>}
+        {page==='competitor-profile' && compProfile && <CompetitorProfilePage comp={compProfile} onBack={backFromProfile} range={range}/>}
+        {page==='intel' && <IntelPage range={range}/>}
+        {page==='alerts' && <AlertsPage range={range}/>}
+        {page==='reports' && <ReportsPage range={range}/>}
+        {page==='settings' && <SettingsPage/>}
+      </div>
+      <MobNav page={page} nav={nav}/>
+      {showAdd && <AddModal onClose={()=>setShowAdd(false)}/>}
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
